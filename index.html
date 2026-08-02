@@ -147,7 +147,8 @@
   <script>
     const SUPABASE_URL = 'https://zvzzbwfmjfjbffyclyws.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_ufJvMq3VX9sq2_bDnsW1OQ_FSclYUap';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Исправлено: supabase -> db
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const ADMIN_PASSWORD = 'velutto2026';
     let isAdmin = false;
@@ -192,7 +193,7 @@
       skeleton.classList.remove('hidden');
       grid.innerHTML = '';
 
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from('products')
         .select('*')
         .order('created_at', { ascending: false });
@@ -225,7 +226,6 @@
         card.style.background = 'var(--tg-secondary)';
         card.style.borderColor = '#2a2a2a';
 
-        // ВАЖНО: UUID в кавычках
         card.innerHTML = `
           <div onclick="openSheet('${p.id}')" class="cursor-pointer">
             <img src="${img}" class="w-full aspect-square object-cover" loading="lazy" onerror="this.src='https://picsum.photos/id/1011/400/400'">
@@ -346,7 +346,7 @@
 
       const total = cart.reduce((s, i) => s + (Number(i.price) || 0), 0);
 
-      const { error } = await supabase.from('orders').insert([{
+      const { error } = await db.from('orders').insert([{
         user_email: `${name} | ${phone}`,
         items: cart,
         total_amount: total,
@@ -394,7 +394,7 @@
         const file = fileInput.files[0];
         const fileName = `${Date.now()}.${file.name.split('.').pop()}`;
 
-        const { error: uploadError } = await supabase.storage
+        const { error: uploadError } = await db.storage
           .from('product-images')
           .upload(fileName, file);
 
@@ -404,7 +404,7 @@
           return;
         }
 
-        const { data: { publicUrl } } = supabase.storage
+        const { data: { publicUrl } } = db.storage
           .from('product-images')
           .getPublicUrl(fileName);
 
@@ -414,7 +414,7 @@
       const sizes = sizesStr ? sizesStr.split(',').map(s => s.trim()).filter(Boolean) : [];
       const colors = colorsStr ? colorsStr.split(',').map(c => c.trim()).filter(Boolean) : [];
 
-      const { error } = await supabase.from('products').insert([{
+      const { error } = await db.from('products').insert([{
         name,
         price,
         images: imageUrl ? [imageUrl] : [],

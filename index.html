@@ -78,18 +78,16 @@
     </div>
   </header>
 
-  <!-- Promo Banner (Главное видео/фото) -->
+  <!-- Promo Banner (Главный баннер с текстом) -->
   <div class="px-4 pt-4">
     <div class="relative w-full aspect-[21/9] rounded-2xl overflow-hidden shadow-lg border" style="border-color: #2a2a2a; background: var(--tg-secondary);">
-      <div id="banner-container" class="w-full h-full">
-        <video id="promo-video" src="https://assets.mixkit.co/videos/preview/mixkit-stylish-woman-walking-with-shopping-bags-41443-large.mp4" 
-               autoplay muted loop playsinline class="w-full h-full object-cover">
-        </video>
-      </div>
+      <video src="https://assets.mixkit.co/videos/preview/mixkit-stylish-woman-walking-with-shopping-bags-41443-large.mp4" 
+             autoplay muted loop playsinline class="w-full h-full object-cover">
+      </video>
       <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-3">
         <div>
-          <div class="text-xs font-semibold text-orange-400 uppercase tracking-wider">Новая коллекция</div>
-          <div class="text-sm font-bold text-white">Весна-Лето 2026</div>
+          <div id="banner-tag" class="text-xs font-semibold text-orange-400 uppercase tracking-wider">Новая коллекция</div>
+          <div id="banner-title" class="text-sm font-bold text-white">Весна-Лето 2026</div>
         </div>
       </div>
     </div>
@@ -102,7 +100,6 @@
            style="background: var(--tg-secondary); color: var(--tg-text); border: none;"
            oninput="filterProducts()">
 
-    <!-- Динамические кнопки категорий -->
     <div id="categories-container" class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
       <button onclick="filterByCategory('Все')" class="cat-btn px-4 py-2 rounded-xl text-xs font-medium whitespace-nowrap" style="background: var(--tg-button); color: var(--tg-button-text);">Все</button>
     </div>
@@ -121,11 +118,11 @@
       <div id="admin-content" class="hidden space-y-5">
         <div class="flex rounded-xl p-1 gap-1" style="background: var(--tg-bg);">
           <button onclick="switchAdminTab('products')" id="tab-prod-btn" class="flex-1 py-2 text-xs font-semibold rounded-lg" style="background: var(--tg-button); color: var(--tg-button-text);">Товары</button>
-          <button onclick="switchAdminTab('banner')" id="tab-ban-btn" class="flex-1 py-2 text-xs font-semibold rounded-lg" style="color: var(--tg-hint);">Баннер</button>
+          <button onclick="switchAdminTab('banner')" id="tab-ban-btn" class="flex-1 py-2 text-xs font-semibold rounded-lg" style="color: var(--tg-hint);">Текст баннера</button>
           <button onclick="switchAdminTab('orders')" id="tab-ord-btn" class="flex-1 py-2 text-xs font-semibold rounded-lg" style="color: var(--tg-hint);">Заказы</button>
         </div>
 
-        <!-- Вкладка 1: Управление товарами -->
+        <!-- Вкладка 1: Товары -->
         <div id="admin-products-section" class="space-y-3">
           <div class="flex justify-between items-center">
             <div id="form-title" class="font-semibold text-sm">Добавить товар</div>
@@ -136,7 +133,6 @@
           <input id="admin-name" type="text" placeholder="Название" class="w-full px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
           <input id="admin-price" type="number" placeholder="Цена (₸)" class="w-full px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
           
-          <!-- Выбор существующей категории или ввод новой -->
           <div class="space-y-2">
             <div class="text-xs" style="color: var(--tg-hint);">Категория товара:</div>
             <select id="admin-category-select" onchange="onCategorySelectChange()" class="w-full px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
@@ -161,16 +157,16 @@
           <div id="admin-status" class="text-sm text-center" style="color: var(--tg-hint);"></div>
         </div>
 
-        <!-- Вкладка 2: Управление главным баннером -->
+        <!-- Вкладка 2: Редактирование текста баннера -->
         <div id="admin-banner-section" class="hidden space-y-3">
-          <div class="font-semibold text-sm">Рекламный баннер сверху</div>
-          <div class="text-xs" style="color: var(--tg-hint);">Загрузите видео (.mp4) или фото для главного экрана:</div>
-          <input type="file" id="banner-file" accept="video/*,image/*" class="w-full text-sm" style="border: none;">
-          <button onclick="saveBanner()" class="btn-primary w-full py-3 text-sm">Обновить баннер</button>
+          <div class="font-semibold text-sm">Текст на главном баннере</div>
+          <input id="admin-banner-tag" type="text" placeholder="Верхняя надпись (например: Новая коллекция)" class="w-full px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
+          <input id="admin-banner-title" type="text" placeholder="Основная надпись (например: Весна-Лето 2026)" class="w-full px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
+          <button onclick="saveBannerText()" class="btn-primary w-full py-3 text-sm">Сохранить текст баннера</button>
           <div id="banner-status" class="text-sm text-center" style="color: var(--tg-hint);"></div>
         </div>
 
-        <!-- Вкладка 3: Управление заказами -->
+        <!-- Вкладка 3: Заказы -->
         <div id="admin-orders-section" class="hidden space-y-3">
           <div class="font-semibold text-sm">Список заказов</div>
           <div id="admin-orders-list" class="space-y-3 max-h-96 overflow-y-auto"></div>
@@ -239,6 +235,7 @@
   <script>
     const SUPABASE_URL = 'https://zvzzbwfmjfjbffyclyws.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_ufJvMq3VX9sq2_bDnsW1OQ_FSclYUap';
+    const TELEGRAM_BOT_TOKEN = '8670786763:AAHpynq_52ECKUZZTgbEuhcdILbh90anltI'; 
     const ADMIN_CHAT_ID = '563657323';
 
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -285,6 +282,7 @@
         isAdminLoggedIn = true;
         document.getElementById('admin-auth').classList.add('hidden');
         document.getElementById('admin-content').classList.remove('hidden');
+        loadBannerInputs();
         loadAdminOrders();
         renderProducts(products);
       } else {
@@ -313,6 +311,7 @@
       } else if (tab === 'banner') {
         banSec.classList.remove('hidden');
         banBtn.style.background = 'var(--tg-button)'; banBtn.style.color = 'var(--tg-button-text)';
+        loadBannerInputs();
       } else {
         ordSec.classList.remove('hidden');
         ordBtn.style.background = 'var(--tg-button)'; ordBtn.style.color = 'var(--tg-button-text)';
@@ -352,7 +351,7 @@
 
       products = data || [];
       extractCategories();
-      loadBanner();
+      loadBannerText();
       filterProducts();
     }
 
@@ -453,39 +452,27 @@
       });
     }
 
-    async function loadBanner() {
-      const { data } = await db.from('settings').select('*').eq('key', 'promo_banner').single();
-      if (data && data.value) {
-        const container = document.getElementById('banner-container');
-        const url = data.value;
-        if (url.includes('.mp4') || url.includes('video')) {
-          container.innerHTML = `<video src="${url}" autoplay muted loop playsinline class="w-full h-full object-cover"></video>`;
-        } else {
-          container.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
-        }
-      }
+    // Сохранение и загрузка текстов баннера через localStorage (надежно и без лишних таблиц)
+    function loadBannerText() {
+      const tag = localStorage.getItem('banner_tag') || 'Новая коллекция';
+      const title = localStorage.getItem('banner_title') || 'Весна-Лето 2026';
+      document.getElementById('banner-tag').innerText = tag;
+      document.getElementById('banner-title').innerText = title;
     }
 
-    async function saveBanner() {
-      const fileInput = document.getElementById('banner-file');
-      const status = document.getElementById('banner-status');
-      if (fileInput.files.length === 0) {
-        status.innerText = 'Выберите файл!';
-        return;
-      }
-      status.innerText = 'Загрузка баннера...';
-      const file = fileInput.files[0];
-      const fileName = `banner_${Date.now()}.${file.name.split('.').pop()}`;
-      const { error: uploadError } = await db.storage.from('product-images').upload(fileName, file);
-      if (uploadError) {
-        status.innerText = 'Ошибка загрузки';
-        return;
-      }
-      const { data: { publicUrl } } = db.storage.from('product-images').getPublicUrl(fileName);
-      
-      await db.from('settings').upsert({ key: 'promo_banner', value: publicUrl });
-      status.innerText = 'Баннер успешно обновлен!';
-      loadBanner();
+    function loadBannerInputs() {
+      document.getElementById('admin-banner-tag').value = localStorage.getItem('banner_tag') || 'Новая коллекция';
+      document.getElementById('admin-banner-title').value = localStorage.getItem('banner_title') || 'Весна-Лето 2026';
+    }
+
+    function saveBannerText() {
+      const tag = sanitize(document.getElementById('admin-banner-tag').value);
+      const title = sanitize(document.getElementById('admin-banner-title').value);
+      localStorage.setItem('banner_tag', tag);
+      localStorage.setItem('banner_title', title);
+      loadBannerText();
+      document.getElementById('banner-status').innerText = 'Текст успешно сохранен!';
+      setTimeout(() => document.getElementById('banner-status').innerText = '', 2000);
     }
 
     function openSheet(id) {

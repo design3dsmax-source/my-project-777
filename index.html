@@ -49,6 +49,12 @@
       0% { background-position: 200% 0; }
       100% { background-position: -200% 0; }
     }
+    input {
+      border: 1px solid #3a3a3a;
+    }
+    input:focus {
+      border-color: var(--tg-button);
+    }
   </style>
 </head>
 <body>
@@ -74,23 +80,35 @@
   <div class="px-4 pt-4">
     <input id="search" type="text" placeholder="Поиск по коллекции..."
            class="w-full px-4 py-3 rounded-2xl text-sm outline-none"
-           style="background: var(--tg-secondary); color: var(--tg-text);"
+           style="background: var(--tg-secondary); color: var(--tg-text); border: none;"
            oninput="filterProducts()">
   </div>
 
   <!-- Admin Panel -->
   <div id="admin-panel" class="hidden px-4 pt-4">
     <div class="rounded-2xl p-4 mb-4" style="background: var(--tg-secondary);">
-      <div class="font-semibold mb-3">Добавить товар</div>
-      <input id="admin-name" type="text" placeholder="Название" class="w-full mb-2 px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
-      <input id="admin-price" type="number" placeholder="Цена" class="w-full mb-2 px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
-      <input id="admin-sizes" type="text" placeholder="Размеры (S, M, L)" class="w-full mb-2 px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
-      <input id="admin-colors" type="text" placeholder="Цвета (чёрный, белый)" class="w-full mb-2 px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
-      <div class="mb-3">
-        <input type="file" id="admin-photo" accept="image/*" class="w-full text-sm">
+      
+      <!-- Форма ввода пароля -->
+      <div id="admin-auth">
+        <div class="font-semibold mb-3">Вход в панель управления</div>
+        <input id="admin-pass-input" type="password" placeholder="Пароль" class="w-full mb-3 px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
+        <button onclick="checkAdminPass()" class="btn-primary w-full py-3 text-sm">Войти</button>
       </div>
-      <button onclick="addProduct()" class="btn-primary w-full py-3 text-sm">Добавить товар</button>
-      <div id="admin-status" class="text-sm mt-2 text-center" style="color: var(--tg-hint);"></div>
+
+      <!-- Сама форма добавления товара (скрыта до ввода пароля) -->
+      <div id="admin-content" class="hidden">
+        <div class="font-semibold mb-3">Добавить товар</div>
+        <input id="admin-name" type="text" placeholder="Название" class="w-full mb-2 px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
+        <input id="admin-price" type="number" placeholder="Цена" class="w-full mb-2 px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
+        <input id="admin-sizes" type="text" placeholder="Размеры (S, M, L)" class="w-full mb-2 px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
+        <input id="admin-colors" type="text" placeholder="Цвета (чёрный, белый)" class="w-full mb-2 px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
+        <div class="mb-3 mt-2">
+          <input type="file" id="admin-photo" accept="image/*" class="w-full text-sm" style="border: none;">
+        </div>
+        <button onclick="addProduct()" class="btn-primary w-full py-3 text-sm">Опубликовать товар</button>
+        <div id="admin-status" class="text-sm mt-2 text-center" style="color: var(--tg-hint);"></div>
+      </div>
+
     </div>
   </div>
 
@@ -132,7 +150,15 @@
       <button onclick="hideCart()" class="text-3xl leading-none" style="color: var(--tg-hint);">×</button>
     </div>
     <div id="cart-items" class="space-y-3 mb-6"></div>
+    
     <div class="border-t pt-4" style="border-color: #2a2a2a;">
+      <!-- Новая форма заказа -->
+      <div id="checkout-form" class="mb-5 space-y-3 hidden">
+        <div class="text-sm font-semibold mb-2" style="color: var(--tg-hint);">Контактные данные</div>
+        <input id="order-name" type="text" placeholder="Ваше имя" class="w-full px-3 py-3 rounded-xl text-sm outline-none" style="background: var(--tg-secondary); color: var(--tg-text);">
+        <input id="order-phone" type="tel" placeholder="Номер телефона" class="w-full px-3 py-3 rounded-xl text-sm outline-none" style="background: var(--tg-secondary); color: var(--tg-text);">
+      </div>
+
       <div class="flex justify-between text-lg font-semibold mb-4">
         <span>Итого</span>
         <span id="cart-total">0 ₸</span>
@@ -150,10 +176,10 @@
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const ADMIN_PASSWORD = 'velutto2026';
-    let isAdmin = false;
     let products = [];
     let cart = [];
 
+    // Telegram UI
     if (window.Telegram?.WebApp) {
       const tg = window.Telegram.WebApp;
       tg.ready();
@@ -166,23 +192,37 @@
       document.documentElement.style.setProperty('--tg-secondary', tg.themeParams.secondary_bg_color || '#1c1c1e');
     }
 
+    // Показ системных сообщений Telegram
+    function showMsg(text) {
+      if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.showAlert(text);
+      } else {
+        alert(text);
+      }
+    }
+
     function sanitize(str) {
       if (!str) return '';
       return String(str).replace(/[<>\"']/g, '').trim().slice(0, 300);
     }
 
+    // НОВАЯ ЛОГИКА АДМИНКИ
     function toggleAdmin() {
-      if (isAdmin) {
-        isAdmin = false;
-        document.getElementById('admin-panel').classList.add('hidden');
-        return;
-      }
-      const pass = prompt('Введите пароль админа:');
-      if (pass === ADMIN_PASSWORD) {
-        isAdmin = true;
-        document.getElementById('admin-panel').classList.remove('hidden');
+      const panel = document.getElementById('admin-panel');
+      if (panel.classList.contains('hidden')) {
+        panel.classList.remove('hidden');
       } else {
-        alert('Неверный пароль');
+        panel.classList.add('hidden');
+      }
+    }
+
+    function checkAdminPass() {
+      const pass = document.getElementById('admin-pass-input').value;
+      if (pass === ADMIN_PASSWORD) {
+        document.getElementById('admin-auth').classList.add('hidden');
+        document.getElementById('admin-content').classList.remove('hidden');
+      } else {
+        showMsg('Неверный пароль!');
       }
     }
 
@@ -225,7 +265,6 @@
         card.style.background = 'var(--tg-secondary)';
         card.style.borderColor = '#2a2a2a';
 
-        // ВАЖНО: UUID в кавычках
         card.innerHTML = `
           <div onclick="openSheet('${p.id}')" class="cursor-pointer">
             <img src="${img}" class="w-full aspect-square object-cover" loading="lazy" onerror="this.src='https://picsum.photos/id/1011/400/400'">
@@ -297,11 +336,14 @@
 
     function showCart() {
       const container = document.getElementById('cart-items');
+      const checkoutForm = document.getElementById('checkout-form');
       container.innerHTML = '';
 
       if (cart.length === 0) {
         container.innerHTML = `<div class="text-center py-10" style="color: var(--tg-hint);">Корзина пуста</div>`;
+        checkoutForm.classList.add('hidden');
       } else {
+        checkoutForm.classList.remove('hidden');
         let total = 0;
         cart.forEach((item, i) => {
           total += Number(item.price) || 0;
@@ -337,12 +379,20 @@
       showCart();
     }
 
+    // НОВАЯ ЛОГИКА ОФОРМЛЕНИЯ ЗАКАЗА
     async function checkout() {
       if (cart.length === 0) return;
 
-      const name = sanitize(prompt('Ваше имя:'));
-      const phone = sanitize(prompt('Номер телефона:'));
-      if (!name || !phone) return alert('Заполните имя и телефон');
+      const nameInput = document.getElementById('order-name');
+      const phoneInput = document.getElementById('order-phone');
+      
+      const name = sanitize(nameInput.value);
+      const phone = sanitize(phoneInput.value);
+
+      if (!name || !phone) {
+        showMsg('Пожалуйста, заполните ваше имя и номер телефона');
+        return;
+      }
 
       const total = cart.reduce((s, i) => s + (Number(i.price) || 0), 0);
 
@@ -354,13 +404,17 @@
       }]);
 
       if (error) {
-        alert('Ошибка оформления. Попробуйте позже.');
+        showMsg('Ошибка оформления. Попробуйте позже.');
         console.error(error);
         return;
       }
 
-      alert('Заказ принят. Мы свяжемся с вами.');
+      showMsg('Заказ успешно принят! Мы скоро свяжемся с вами.');
+      
+      // Очищаем корзину и поля
       cart = [];
+      nameInput.value = '';
+      phoneInput.value = '';
       updateCartCount();
       hideCart();
     }

@@ -25,8 +25,6 @@
       -webkit-tap-highlight-color: transparent;
     }
     * { transition: all 0.2s ease-in-out; }
-    .product-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-    .product-card:active { transform: scale(0.98); }
     .btn-primary {
       background: var(--tg-button);
       color: var(--tg-button-text);
@@ -34,6 +32,14 @@
       font-weight: 600;
     }
     .btn-primary:active { opacity: 0.85; }
+    .bottom-sheet {
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .bottom-sheet.open { transform: translateY(0); }
+    .checkmark { display: none; }
+    .btn-success .btn-text { display: none; }
+    .btn-success .checkmark { display: inline; }
     .skeleton {
       background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
       background-size: 200% 100%;
@@ -43,14 +49,6 @@
       0% { background-position: 200% 0; }
       100% { background-position: -200% 0; }
     }
-    .bottom-sheet {
-      transform: translateY(100%);
-      transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
-    }
-    .bottom-sheet.open { transform: translateY(0); }
-    .checkmark { display: none; }
-    .btn-success .btn-text { display: none; }
-    .btn-success .checkmark { display: inline; }
   </style>
 </head>
 <body>
@@ -63,22 +61,38 @@
         <div class="text-[11px]" style="color: var(--tg-hint);">Тихая роскошь</div>
       </div>
     </div>
-    <button onclick="showCart()" class="relative flex items-center gap-2 px-3.5 py-2 rounded-2xl text-sm" style="background: var(--tg-secondary);">
-      🛒
-      <span id="cart-count" class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full text-[11px] font-bold flex items-center justify-center" style="background: var(--tg-button); color: var(--tg-button-text);">0</span>
-    </button>
+    <div class="flex items-center gap-2">
+      <button onclick="toggleAdmin()" class="px-3 py-2 rounded-2xl text-sm" style="background: var(--tg-secondary);">Админ</button>
+      <button onclick="showCart()" class="relative flex items-center gap-2 px-3.5 py-2 rounded-2xl text-sm" style="background: var(--tg-secondary);">
+        🛒
+        <span id="cart-count" class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full text-[11px] font-bold flex items-center justify-center" style="background: var(--tg-button); color: var(--tg-button-text);">0</span>
+      </button>
+    </div>
   </header>
 
   <!-- Search -->
   <div class="px-4 pt-4">
-    <input id="search" type="text" placeholder="Поиск по коллекции..." 
+    <input id="search" type="text" placeholder="Поиск по коллекции..."
            class="w-full px-4 py-3 rounded-2xl text-sm outline-none"
            style="background: var(--tg-secondary); color: var(--tg-text);"
            oninput="filterProducts()">
   </div>
 
-  <!-- Products -->
-  <div id="products-grid" class="p-4 grid grid-cols-2 gap-3"></div>
+  <!-- Admin Panel -->
+  <div id="admin-panel" class="hidden px-4 pt-4">
+    <div class="rounded-2xl p-4 mb-4" style="background: var(--tg-secondary);">
+      <div class="font-semibold mb-3">Добавить товар</div>
+      <input id="admin-name" type="text" placeholder="Название" class="w-full mb-2 px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
+      <input id="admin-price" type="number" placeholder="Цена" class="w-full mb-2 px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
+      <input id="admin-sizes" type="text" placeholder="Размеры (S, M, L)" class="w-full mb-2 px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
+      <input id="admin-colors" type="text" placeholder="Цвета (чёрный, белый)" class="w-full mb-2 px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
+      <div class="mb-3">
+        <input type="file" id="admin-photo" accept="image/*" class="w-full text-sm">
+      </div>
+      <button onclick="addProduct()" class="btn-primary w-full py-3 text-sm">Добавить товар</button>
+      <div id="admin-status" class="text-sm mt-2 text-center" style="color: var(--tg-hint);"></div>
+    </div>
+  </div>
 
   <!-- Skeleton -->
   <div id="skeleton" class="p-4 grid grid-cols-2 gap-3 hidden">
@@ -100,7 +114,10 @@
     </div>
   </div>
 
-  <!-- Bottom Sheet (детали товара) -->
+  <!-- Products -->
+  <div id="products-grid" class="p-4 grid grid-cols-2 gap-3"></div>
+
+  <!-- Bottom Sheet -->
   <div id="sheet-overlay" class="fixed inset-0 bg-black/60 z-50 hidden" onclick="closeSheet()"></div>
   <div id="bottom-sheet" class="bottom-sheet fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl p-5 max-h-[85vh] overflow-auto" style="background: var(--tg-bg);">
     <div class="w-10 h-1 rounded-full mx-auto mb-5" style="background: #3a3a3a;"></div>
@@ -132,11 +149,11 @@
     const SUPABASE_KEY = 'sb_publishable_ufJvMq3VX9sq2_bDnsW1OQ_FSclYUap';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    const ADMIN_PASSWORD = 'velutto2026';
+    let isAdmin = false;
     let products = [];
     let cart = [];
-    let selectedProduct = null;
 
-    // Telegram theme
     if (window.Telegram?.WebApp) {
       const tg = window.Telegram.WebApp;
       tg.ready();
@@ -149,40 +166,45 @@
       document.documentElement.style.setProperty('--tg-secondary', tg.themeParams.secondary_bg_color || '#1c1c1e');
     }
 
-    // Sanitize
     function sanitize(str) {
       if (!str) return '';
       return String(str).replace(/[<>\"']/g, '').trim().slice(0, 300);
     }
 
-    // Rate limit simple
-    const rateMap = new Map();
-    function checkRate(userId) {
-      const now = Date.now();
-      const key = userId || 'anon';
-      const arr = rateMap.get(key) || [];
-      const recent = arr.filter(t => now - t < 5000);
-      if (recent.length >= 10) return false;
-      recent.push(now);
-      rateMap.set(key, recent);
-      return true;
+    function toggleAdmin() {
+      if (isAdmin) {
+        isAdmin = false;
+        document.getElementById('admin-panel').classList.add('hidden');
+        return;
+      }
+      const pass = prompt('Введите пароль админа:');
+      if (pass === ADMIN_PASSWORD) {
+        isAdmin = true;
+        document.getElementById('admin-panel').classList.remove('hidden');
+      } else {
+        alert('Неверный пароль');
+      }
     }
 
     async function loadProducts() {
-      document.getElementById('skeleton').classList.remove('hidden');
-      document.getElementById('products-grid').innerHTML = '';
+      const skeleton = document.getElementById('skeleton');
+      const grid = document.getElementById('products-grid');
+      skeleton.classList.remove('hidden');
+      grid.innerHTML = '';
 
       const { data, error } = await supabase
         .from('products')
         .select('*')
         .order('created_at', { ascending: false });
 
-      document.getElementById('skeleton').classList.add('hidden');
+      skeleton.classList.add('hidden');
 
       if (error) {
         console.error(error);
+        grid.innerHTML = `<div class="col-span-2 text-center py-10" style="color: var(--tg-hint);">Ошибка загрузки товаров</div>`;
         return;
       }
+
       products = data || [];
       renderProducts(products);
     }
@@ -191,23 +213,29 @@
       const grid = document.getElementById('products-grid');
       grid.innerHTML = '';
 
+      if (!list.length) {
+        grid.innerHTML = `<div class="col-span-2 text-center py-10" style="color: var(--tg-hint);">Товары пока отсутствуют</div>`;
+        return;
+      }
+
       list.forEach(p => {
-        const img = p.images?.[0] || 'https://picsum.photos/id/1011/400/400';
+        const img = (p.images && p.images[0]) ? p.images[0] : 'https://picsum.photos/id/1011/400/400';
         const card = document.createElement('div');
-        card.className = 'product-card rounded-2xl overflow-hidden border';
+        card.className = 'rounded-2xl overflow-hidden border';
         card.style.background = 'var(--tg-secondary)';
         card.style.borderColor = '#2a2a2a';
 
+        // ВАЖНО: UUID в кавычках
         card.innerHTML = `
-          <div onclick="openSheet(${p.id})" class="cursor-pointer">
-            <img src="${img}" class="w-full aspect-square object-cover" loading="lazy">
+          <div onclick="openSheet('${p.id}')" class="cursor-pointer">
+            <img src="${img}" class="w-full aspect-square object-cover" loading="lazy" onerror="this.src='https://picsum.photos/id/1011/400/400'">
             <div class="p-3">
-              <div class="text-[13px] font-normal mb-1 line-clamp-2" style="color: var(--tg-hint);">${p.name}</div>
-              <div class="text-[18px] font-bold mb-3">${p.price} ₸</div>
+              <div class="text-[13px] font-normal mb-1 line-clamp-2" style="color: var(--tg-hint);">${p.name || ''}</div>
+              <div class="text-[18px] font-bold mb-3">${p.price || 0} ₸</div>
             </div>
           </div>
           <div class="px-3 pb-3">
-            <button id="btn-${p.id}" onclick="event.stopPropagation(); addToCart(${p.id})" 
+            <button id="btn-${p.id}" onclick="event.stopPropagation(); addToCart('${p.id}')"
                     class="btn-primary w-full py-2.5 text-sm flex items-center justify-center gap-2">
               <span class="btn-text">В корзину</span>
               <span class="checkmark">✓</span>
@@ -220,26 +248,25 @@
 
     function filterProducts() {
       const q = document.getElementById('search').value.toLowerCase().trim();
-      const filtered = products.filter(p => p.name.toLowerCase().includes(q));
+      const filtered = products.filter(p => (p.name || '').toLowerCase().includes(q));
       renderProducts(filtered);
     }
 
     function openSheet(id) {
       const p = products.find(x => x.id === id);
       if (!p) return;
-      selectedProduct = p;
 
-      const img = p.images?.[0] || 'https://picsum.photos/id/1011/400/400';
-      const sizes = p.sizes?.length ? p.sizes.join(', ') : '—';
-      const colors = p.colors?.length ? p.colors.join(', ') : '—';
+      const img = (p.images && p.images[0]) ? p.images[0] : 'https://picsum.photos/id/1011/400/400';
+      const sizes = (p.sizes && p.sizes.length) ? p.sizes.join(', ') : '—';
+      const colors = (p.colors && p.colors.length) ? p.colors.join(', ') : '—';
 
       document.getElementById('sheet-content').innerHTML = `
-        <img src="${img}" class="w-full aspect-[4/5] object-cover rounded-2xl mb-4">
-        <div class="text-[13px] mb-1" style="color: var(--tg-hint);">${p.name}</div>
-        <div class="text-[22px] font-bold mb-4">${p.price} ₸</div>
+        <img src="${img}" class="w-full aspect-[4/5] object-cover rounded-2xl mb-4" onerror="this.src='https://picsum.photos/id/1011/400/400'">
+        <div class="text-[13px] mb-1" style="color: var(--tg-hint);">${p.name || ''}</div>
+        <div class="text-[22px] font-bold mb-4">${p.price || 0} ₸</div>
         <div class="text-sm mb-1">Размеры: ${sizes}</div>
         <div class="text-sm mb-5">Цвета: ${colors}</div>
-        <button onclick="addToCart(${p.id}); closeSheet();" class="btn-primary w-full py-3.5 text-base">В корзину</button>
+        <button onclick="addToCart('${p.id}'); closeSheet();" class="btn-primary w-full py-3.5 text-base">В корзину</button>
       `;
 
       document.getElementById('sheet-overlay').classList.remove('hidden');
@@ -252,15 +279,11 @@
     }
 
     function addToCart(id) {
-      if (!checkRate()) return alert('Слишком много запросов');
-
       const p = products.find(x => x.id === id);
       if (!p) return;
-
       cart.push({ ...p });
       updateCartCount();
 
-      // Animation
       const btn = document.getElementById(`btn-${id}`);
       if (btn) {
         btn.classList.add('btn-success');
@@ -281,16 +304,16 @@
       } else {
         let total = 0;
         cart.forEach((item, i) => {
-          total += item.price;
-          const img = item.images?.[0] || 'https://picsum.photos/id/1011/64/64';
+          total += Number(item.price) || 0;
+          const img = (item.images && item.images[0]) ? item.images[0] : 'https://picsum.photos/id/1011/64/64';
           const el = document.createElement('div');
           el.className = 'flex gap-3 items-center p-3 rounded-2xl';
           el.style.background = 'var(--tg-secondary)';
           el.innerHTML = `
             <img src="${img}" class="w-14 h-14 rounded-xl object-cover flex-shrink-0">
             <div class="flex-1 min-w-0">
-              <div class="text-sm font-medium truncate">${item.name}</div>
-              <div class="text-[15px] font-bold" style="color: var(--tg-button);">${item.price} ₸</div>
+              <div class="text-sm font-medium truncate">${item.name || ''}</div>
+              <div class="text-[15px] font-bold" style="color: var(--tg-button);">${item.price || 0} ₸</div>
             </div>
             <button onclick="removeFromCart(${i})" class="text-xl px-2" style="color: #ef4444;">×</button>
           `;
@@ -316,13 +339,12 @@
 
     async function checkout() {
       if (cart.length === 0) return;
-      if (!checkRate()) return alert('Слишком много запросов');
 
       const name = sanitize(prompt('Ваше имя:'));
       const phone = sanitize(prompt('Номер телефона:'));
       if (!name || !phone) return alert('Заполните имя и телефон');
 
-      const total = cart.reduce((s, i) => s + i.price, 0);
+      const total = cart.reduce((s, i) => s + (Number(i.price) || 0), 0);
 
       const { error } = await supabase.from('orders').insert([{
         user_email: `${name} | ${phone}`,
@@ -349,6 +371,71 @@
       } else {
         window.open('https://t.me/Azhar_Suleimenova', '_blank');
       }
+    }
+
+    async function addProduct() {
+      const name = sanitize(document.getElementById('admin-name').value);
+      const price = parseFloat(document.getElementById('admin-price').value);
+      const sizesStr = document.getElementById('admin-sizes').value;
+      const colorsStr = document.getElementById('admin-colors').value;
+      const fileInput = document.getElementById('admin-photo');
+      const status = document.getElementById('admin-status');
+
+      if (!name || !price) {
+        status.innerText = 'Заполните название и цену';
+        return;
+      }
+
+      status.innerText = 'Загрузка...';
+
+      let imageUrl = null;
+
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        const fileName = `${Date.now()}.${file.name.split('.').pop()}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('product-images')
+          .upload(fileName, file);
+
+        if (uploadError) {
+          status.innerText = 'Ошибка загрузки фото';
+          console.error(uploadError);
+          return;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(fileName);
+
+        imageUrl = publicUrl;
+      }
+
+      const sizes = sizesStr ? sizesStr.split(',').map(s => s.trim()).filter(Boolean) : [];
+      const colors = colorsStr ? colorsStr.split(',').map(c => c.trim()).filter(Boolean) : [];
+
+      const { error } = await supabase.from('products').insert([{
+        name,
+        price,
+        images: imageUrl ? [imageUrl] : [],
+        sizes,
+        colors
+      }]);
+
+      if (error) {
+        status.innerText = 'Ошибка добавления товара';
+        console.error(error);
+        return;
+      }
+
+      status.innerText = 'Товар успешно добавлен!';
+      document.getElementById('admin-name').value = '';
+      document.getElementById('admin-price').value = '';
+      document.getElementById('admin-sizes').value = '';
+      document.getElementById('admin-colors').value = '';
+      fileInput.value = '';
+
+      loadProducts();
     }
 
     // Init

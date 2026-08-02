@@ -181,9 +181,9 @@
     const SUPABASE_URL = 'https://zvzzbwfmjfjbffyclyws.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_ufJvMq3VX9sq2_bDnsW1OQ_FSclYUap';
     
-    // Вставьте ваш токен бота от BotFather сюда:
-   const TELEGRAM_BOT_TOKEN = '8670786763:AAHpynq_52ECKUZZTgbEuhcdILbh90anltI'; 
-const ADMIN_CHAT_ID = '563657323';
+    // Вставлены ваши данные: токен бота и ваш Telegram ID
+    const TELEGRAM_BOT_TOKEN = '8670786763:AAHpynq_52ECKUZZTgbEuhcdILbh90anltI'; 
+    const ADMIN_CHAT_ID = '563657323';
 
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -442,7 +442,7 @@ const ADMIN_CHAT_ID = '563657323';
                     `💰 Итого: ${total} ₸`;
 
       // 3. Отправляем через Telegram Bot API
-      if (TELEGRAM_BOT_TOKEN && TELEGRAM_BOT_TOKEN !== 'ВАШ_ТОКЕН_БОТА') {
+      if (TELEGRAM_BOT_TOKEN) {
         try {
           await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
             method: 'POST',

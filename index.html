@@ -78,10 +78,9 @@
     </div>
   </header>
 
-  <!-- Promo Banner (Видео / Фото реклама на главном экране) -->
+  <!-- Promo Banner -->
   <div class="px-4 pt-4">
     <div class="relative w-full aspect-[21/9] rounded-2xl overflow-hidden shadow-lg border" style="border-color: #2a2a2a; background: var(--tg-secondary);">
-      <!-- Вы можете заменить эту ссылку на ваше видео (.mp4) или gif/картинку -->
       <video src="https://assets.mixkit.co/videos/preview/mixkit-stylish-woman-walking-with-shopping-bags-41443-large.mp4" 
              autoplay muted loop playsinline class="w-full h-full object-cover">
       </video>
@@ -101,7 +100,6 @@
            style="background: var(--tg-secondary); color: var(--tg-text); border: none;"
            oninput="filterProducts()">
 
-    <!-- Категории товаров -->
     <div id="categories-container" class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
       <button onclick="filterByCategory('Все')" class="cat-btn px-4 py-2 rounded-xl text-xs font-medium whitespace-nowrap" style="background: var(--tg-button); color: var(--tg-button-text);">Все</button>
       <button onclick="filterByCategory('Платья')" class="cat-btn px-4 py-2 rounded-xl text-xs font-medium whitespace-nowrap" style="background: var(--tg-secondary); color: var(--tg-hint);">Платья</button>
@@ -115,22 +113,18 @@
   <div id="admin-panel" class="hidden px-4 pt-4">
     <div class="rounded-2xl p-4 mb-4 space-y-4" style="background: var(--tg-secondary);">
       
-      <!-- Авторизация админа -->
       <div id="admin-auth">
         <div class="font-semibold mb-3">Вход в панель управления</div>
         <input id="admin-pass-input" type="password" placeholder="Пароль" class="w-full mb-3 px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
         <button onclick="checkAdminPass()" class="btn-primary w-full py-3 text-sm">Войти</button>
       </div>
 
-      <!-- Контент админки (Товары и Заказы) -->
       <div id="admin-content" class="hidden space-y-5">
-        <!-- Переключатель вкладок админки -->
         <div class="flex rounded-xl p-1 gap-1" style="background: var(--tg-bg);">
           <button onclick="switchAdminTab('products')" id="tab-prod-btn" class="flex-1 py-2 text-xs font-semibold rounded-lg" style="background: var(--tg-button); color: var(--tg-button-text);">Товары</button>
           <button onclick="switchAdminTab('orders')" id="tab-ord-btn" class="flex-1 py-2 text-xs font-semibold rounded-lg" style="color: var(--tg-hint);">Заказы</button>
         </div>
 
-        <!-- Вкладка 1: Управление товарами -->
         <div id="admin-products-section" class="space-y-3">
           <div class="flex justify-between items-center">
             <div id="form-title" class="font-semibold text-sm">Добавить товар</div>
@@ -160,12 +154,9 @@
           <div id="admin-status" class="text-sm text-center" style="color: var(--tg-hint);"></div>
         </div>
 
-        <!-- Вкладка 2: Управление заказами -->
         <div id="admin-orders-section" class="hidden space-y-3">
           <div class="font-semibold text-sm">Список заказов</div>
-          <div id="admin-orders-list" class="space-y-3 max-h-96 overflow-y-auto">
-            <!-- Загружается динамически -->
-          </div>
+          <div id="admin-orders-list" class="space-y-3 max-h-96 overflow-y-auto"></div>
         </div>
 
       </div>
@@ -194,7 +185,7 @@
   <!-- Products Grid -->
   <div id="products-grid" class="p-4 grid grid-cols-2 gap-3"></div>
 
-  <!-- Bottom Sheet (Карточка товара с галереей и выбором размера/цвета) -->
+  <!-- Bottom Sheet -->
   <div id="sheet-overlay" class="fixed inset-0 bg-black/60 z-50 hidden" onclick="closeSheet()"></div>
   <div id="bottom-sheet" class="bottom-sheet fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl p-5 max-h-[85vh] overflow-auto" style="background: var(--tg-bg);">
     <div class="w-10 h-1 rounded-full mx-auto mb-4" style="background: #3a3a3a;"></div>
@@ -349,7 +340,8 @@
       const q = document.getElementById('search').value.toLowerCase().trim();
       const filtered = products.filter(p => {
         const matchesSearch = (p.name || '').toLowerCase().includes(q);
-        const matchesCat = (currentCategory === 'Все' || p.category === currentCategory);
+        const pCat = p.category || 'Платья';
+        const matchesCat = (currentCategory === 'Все' || pCat === currentCategory);
         return matchesSearch && matchesCat;
       });
       renderProducts(filtered);
@@ -404,7 +396,6 @@
       });
     }
 
-    // Карточка товара с мульти-фото галереей и выбором размеров/цветов
     function openSheet(id) {
       const p = products.find(x => x.id === id);
       if (!p) return;
@@ -421,7 +412,7 @@
 
       if (images.length > 1) {
         imgGalleryHTML += `<div class="flex gap-2 mb-4 overflow-x-auto no-scrollbar">`;
-        images.forEach((imgUrl, idx) => {
+        images.forEach((imgUrl) => {
           imgGalleryHTML += `<img src="${imgUrl}" onclick="document.getElementById('main-sheet-img').src='${imgUrl}'" class="w-16 h-16 rounded-xl object-cover cursor-pointer border border-[#3a3a3a]">`;
         });
         imgGalleryHTML += `</div>`;
@@ -560,7 +551,6 @@
       showCart();
     }
 
-    // Оформление заказа и отправка уведомлений
     async function checkout() {
       if (cart.length === 0) return;
 
@@ -625,7 +615,6 @@
       }
     }
 
-    // Управление заказами в админке
     async function loadAdminOrders() {
       const container = document.getElementById('admin-orders-list');
       container.innerHTML = `<div class="text-xs text-center" style="color: var(--tg-hint);">Загрузка заказов...</div>`;
@@ -663,7 +652,6 @@
       loadAdminOrders();
     }
 
-    // Редактирование и добавление товаров с мульти-фото
     function startEdit(id) {
       const p = products.find(x => x.id === id);
       if (!p) return;

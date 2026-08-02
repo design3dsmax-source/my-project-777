@@ -180,6 +180,11 @@
   <script>
     const SUPABASE_URL = 'https://zvzzbwfmjfjbffyclyws.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_ufJvMq3VX9sq2_bDnsW1OQ_FSclYUap';
+    
+    // Вставьте ваш токен бота от BotFather сюда:
+    const TELEGRAM_BOT_TOKEN = 'ВАШ_ТОКЕН_БОТА'; 
+    const ADMIN_CHAT_ID = '563657323';
+
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const ADMIN_PASSWORD = 'velutto2026';
@@ -223,7 +228,7 @@
         isAdminLoggedIn = true;
         document.getElementById('admin-auth').classList.add('hidden');
         document.getElementById('admin-content').classList.remove('hidden');
-        renderProducts(products); // Перерисовываем, чтобы появились кнопки админа у товаров
+        renderProducts(products);
       } else {
         showMsg('Неверный пароль!');
       }
@@ -397,6 +402,7 @@
       showCart();
     }
 
+    // ОФОРМЛЕНИЕ ЗАКАЗА С ОТПРАВКОЙ В TELEGRAM
     async function checkout() {
       if (cart.length === 0) return;
 
@@ -413,6 +419,7 @@
 
       const total = cart.reduce((s, i) => s + (Number(i.price) || 0), 0);
 
+      // 1. Сохраняем в Supabase
       const { error } = await db.from('orders').insert([{
         user_email: `${name} | ${phone}`,
         items: cart,
@@ -424,6 +431,30 @@
         showMsg('Ошибка оформления. Попробуйте позже.');
         console.error(error);
         return;
+      }
+
+      // 2. Формируем текст для отправки в Telegram
+      let itemsList = cart.map((item, index) => `${index + 1}. ${item.name} — ${item.price} ₸`).join('\n');
+      let message = `🔥 Новый заказ в Velutto Studio!\n\n` +
+                    `👤 Имя: ${name}\n` +
+                    `📞 Телефон: ${phone}\n\n` +
+                    `📦 Товары:\n${itemsList}\n\n` +
+                    `💰 Итого: ${total} ₸`;
+
+      // 3. Отправляем через Telegram Bot API
+      if (TELEGRAM_BOT_TOKEN && TELEGRAM_BOT_TOKEN !== 'ВАШ_ТОКЕН_БОТА') {
+        try {
+          await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: ADMIN_CHAT_ID,
+              text: message
+            })
+          });
+        } catch (err) {
+          console.error('Ошибка отправки в Telegram:', err);
+        }
       }
 
       showMsg('Заказ успешно принят! Мы скоро свяжемся с вами.');
@@ -442,7 +473,6 @@
       }
     }
 
-    // РЕДАКТИРОВАНИЕ И УДАЛЕНИЕ ТОВАРОВ
     function startEdit(id) {
       const p = products.find(x => x.id === id);
       if (!p) return;
@@ -457,7 +487,6 @@
       document.getElementById('save-btn').innerText = 'Сохранить изменения';
       document.getElementById('cancel-edit-btn').classList.remove('hidden');
 
-      // Прокрутка к форме админки
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -532,7 +561,6 @@
       const colors = colorsStr ? colorsStr.split(',').map(c => c.trim()).filter(Boolean) : [];
 
       if (editId) {
-        // Режим редактирования (UPDATE)
         const updateData = { name, price, sizes, colors };
         if (imageUrl) {
           updateData.images = [imageUrl];
@@ -548,7 +576,6 @@
 
         status.innerText = 'Товар успешно обновлен!';
       } else {
-        // Режим добавления (INSERT)
         const { error } = await db.from('products').insert([{
           name,
           price,

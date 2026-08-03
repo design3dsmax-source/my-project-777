@@ -578,19 +578,28 @@
                     `📦 Товары:\n${itemsList}\n\n` +
                     `💰 Итого: ${total} ₸`;
 
-      // Ваш номер телефона менеджера
       const managerPhone = '77011258770'; 
       const whatsappUrl = `https://wa.me/${managerPhone}?text=${encodeURIComponent(message)}`;
 
-      showMsg('Заказ принят! Переходим в WhatsApp...');
-      
+      // Очищаем корзину
       cart = [];
       document.getElementById('order-name').value = '';
       document.getElementById('order-phone').value = '';
       updateCartCount();
       hideCart();
 
-      window.open(whatsappUrl, '_blank');
+      // Показываем пользователю кнопку для перехода в WhatsApp (обходит блокировку браузеров)
+      document.getElementById('sheet-content').innerHTML = `
+        <div class="text-center py-6 space-y-4">
+          <div class="text-xl font-bold text-green-500">Заказ успешно принят! 🎉</div>
+          <div class="text-xs" style="color: var(--tg-hint);">Нажмите на кнопку ниже, чтобы отправить детали заказа менеджеру в WhatsApp:</div>
+          <a href="${whatsappUrl}" target="_blank" class="btn-primary block w-full py-3.5 text-center text-base no-underline">
+            Отправить в WhatsApp 📱
+          </a>
+        </div>
+      `;
+      document.getElementById('cart-overlay').classList.remove('hidden');
+      document.getElementById('cart-sheet').classList.add('open');
     }
 
     function writeToManager() {

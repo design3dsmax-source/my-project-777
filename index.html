@@ -37,9 +37,6 @@
       transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
     }
     .bottom-sheet.open { transform: translateY(0); }
-    .checkmark { display: none; }
-    .btn-success .btn-text { display: none; }
-    .btn-success .checkmark { display: inline; }
     .skeleton {
       background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
       background-size: 200% 100%;
@@ -49,12 +46,8 @@
       0% { background-position: 200% 0; }
       100% { background-position: -200% 0; }
     }
-    input, select {
-      border: 1px solid #3a3a3a;
-    }
-    input:focus, select:focus {
-      border-color: var(--tg-button);
-    }
+    input, select { border: 1px solid #3a3a3a; }
+    input:focus, select:focus { border-color: var(--tg-button); }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
@@ -78,7 +71,7 @@
     </div>
   </header>
 
-  <!-- Promo Banner (Главный баннер с текстом) -->
+  <!-- Promo Banner -->
   <div class="px-4 pt-4">
     <div class="relative w-full aspect-[21/9] rounded-2xl overflow-hidden shadow-lg border" style="border-color: #2a2a2a; background: var(--tg-secondary);">
       <video src="https://assets.mixkit.co/videos/preview/mixkit-stylish-woman-walking-with-shopping-bags-41443-large.mp4" 
@@ -122,7 +115,7 @@
           <button onclick="switchAdminTab('orders')" id="tab-ord-btn" class="flex-1 py-2 text-xs font-semibold rounded-lg" style="color: var(--tg-hint);">Заказы</button>
         </div>
 
-        <!-- Вкладка 1: Товары -->
+        <!-- Товары -->
         <div id="admin-products-section" class="space-y-3">
           <div class="flex justify-between items-center">
             <div id="form-title" class="font-semibold text-sm">Добавить товар</div>
@@ -157,16 +150,16 @@
           <div id="admin-status" class="text-sm text-center" style="color: var(--tg-hint);"></div>
         </div>
 
-        <!-- Вкладка 2: Редактирование текста баннера -->
+        <!-- Текст баннера -->
         <div id="admin-banner-section" class="hidden space-y-3">
           <div class="font-semibold text-sm">Текст на главном баннере</div>
-          <input id="admin-banner-tag" type="text" placeholder="Верхняя надпись (например: Новая коллекция)" class="w-full px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
-          <input id="admin-banner-title" type="text" placeholder="Основная надпись (например: Весна-Лето 2026)" class="w-full px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
+          <input id="admin-banner-tag" type="text" placeholder="Верхняя надпись" class="w-full px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
+          <input id="admin-banner-title" type="text" placeholder="Основная надпись" class="w-full px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
           <button onclick="saveBannerText()" class="btn-primary w-full py-3 text-sm">Сохранить текст баннера</button>
           <div id="banner-status" class="text-sm text-center" style="color: var(--tg-hint);"></div>
         </div>
 
-        <!-- Вкладка 3: Заказы -->
+        <!-- Заказы -->
         <div id="admin-orders-section" class="hidden space-y-3">
           <div class="font-semibold text-sm">Список заказов</div>
           <div id="admin-orders-list" class="space-y-3 max-h-96 overflow-y-auto"></div>
@@ -179,20 +172,8 @@
 
   <!-- Skeleton -->
   <div id="skeleton" class="p-4 grid grid-cols-2 gap-3 hidden">
-    <div class="rounded-2xl overflow-hidden">
-      <div class="skeleton aspect-square"></div>
-      <div class="p-3 space-y-2">
-        <div class="skeleton h-4 rounded w-3/4"></div>
-        <div class="skeleton h-5 rounded w-1/2"></div>
-      </div>
-    </div>
-    <div class="rounded-2xl overflow-hidden">
-      <div class="skeleton aspect-square"></div>
-      <div class="p-3 space-y-2">
-        <div class="skeleton h-4 rounded w-3/4"></div>
-        <div class="skeleton h-5 rounded w-1/2"></div>
-      </div>
-    </div>
+    <div class="rounded-2xl overflow-hidden"><div class="skeleton aspect-square"></div></div>
+    <div class="rounded-2xl overflow-hidden"><div class="skeleton aspect-square"></div></div>
   </div>
 
   <!-- Products Grid -->
@@ -235,8 +216,6 @@
   <script>
     const SUPABASE_URL = 'https://zvzzbwfmjfjbffyclyws.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_ufJvMq3VX9sq2_bDnsW1OQ_FSclYUap';
-    const TELEGRAM_BOT_TOKEN = ''; // Токен скрыт
-    const ADMIN_CHAT_ID = '563657323';
 
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -260,11 +239,8 @@
     }
 
     function showMsg(text) {
-      if (window.Telegram?.WebApp) {
-        window.Telegram.WebApp.showAlert(text);
-      } else {
-        alert(text);
-      }
+      if (window.Telegram?.WebApp) window.Telegram.WebApp.showAlert(text);
+      else alert(text);
     }
 
     function sanitize(str) {
@@ -272,9 +248,7 @@
       return String(str).replace(/[<>\"']/g, '').trim().slice(0, 300);
     }
 
-    function toggleAdmin() {
-      document.getElementById('admin-panel').classList.toggle('hidden');
-    }
+    function toggleAdmin() { document.getElementById('admin-panel').classList.toggle('hidden'); }
 
     function checkAdminPass() {
       const pass = document.getElementById('admin-pass-input').value;
@@ -298,9 +272,7 @@
       const banBtn = document.getElementById('tab-ban-btn');
       const ordBtn = document.getElementById('tab-ord-btn');
 
-      prodSec.classList.add('hidden');
-      banSec.classList.add('hidden');
-      ordSec.classList.add('hidden');
+      prodSec.classList.add('hidden'); banSec.classList.add('hidden'); ordSec.classList.add('hidden');
       prodBtn.style.background = 'transparent'; prodBtn.style.color = 'var(--tg-hint)';
       banBtn.style.background = 'transparent'; banBtn.style.color = 'var(--tg-hint)';
       ordBtn.style.background = 'transparent'; ordBtn.style.color = 'var(--tg-hint)';
@@ -336,15 +308,10 @@
       skeleton.classList.remove('hidden');
       grid.innerHTML = '';
 
-      const { data, error } = await db
-        .from('products')
-        .select('*')
-        .order('created_at', { ascending: false });
-
+      const { data, error } = await db.from('products').select('*').order('created_at', { ascending: false });
       skeleton.classList.add('hidden');
 
       if (error) {
-        console.error(error);
         grid.innerHTML = `<div class="col-span-2 text-center py-10" style="color: var(--tg-hint);">Ошибка загрузки товаров</div>`;
         return;
       }
@@ -357,9 +324,7 @@
 
     function extractCategories() {
       const set = new Set(['Платья', 'Костюмы', 'Верхняя одежда', 'Аксессуары']);
-      products.forEach(p => {
-        if (p.category) set.add(p.category);
-      });
+      products.forEach(p => { if (p.category) set.add(p.category); });
       availableCategories = Array.from(set);
       updateCategorySelectOptions();
       renderCategoryButtons();
@@ -368,9 +333,7 @@
     function updateCategorySelectOptions() {
       const select = document.getElementById('admin-category-select');
       let html = '';
-      availableCategories.forEach(cat => {
-        html += `<option value="${cat}">${cat}</option>`;
-      });
+      availableCategories.forEach(cat => { html += `<option value="${cat}">${cat}</option>`; });
       html += `<option value="new">+ Создать новую категорию</option>`;
       select.innerHTML = html;
     }
@@ -397,8 +360,7 @@
       const filtered = products.filter(p => {
         const matchesSearch = (p.name || '').toLowerCase().includes(q);
         const pCat = p.category || 'Платья';
-        const matchesCat = (currentCategory === 'Все' || pCat === currentCategory);
-        return matchesSearch && matchesCat;
+        return matchesSearch && (currentCategory === 'Все' || pCat === currentCategory);
       });
       renderProducts(filtered);
     }
@@ -442,9 +404,7 @@
           <div>
             ${adminButtons}
             <div class="px-3 pb-3">
-              <button onclick="openSheet('${p.id}')" class="btn-primary w-full py-2.5 text-sm flex items-center justify-center gap-2">
-                <span>В корзину</span>
-              </button>
+              <button onclick="openSheet('${p.id}')" class="btn-primary w-full py-2.5 text-sm flex items-center justify-center gap-2"><span>В корзину</span></button>
             </div>
           </div>
         `;
@@ -453,10 +413,8 @@
     }
 
     function loadBannerText() {
-      const tag = localStorage.getItem('banner_tag') || 'Новая коллекция';
-      const title = localStorage.getItem('banner_title') || 'Весна-Лето 2026';
-      document.getElementById('banner-tag').innerText = tag;
-      document.getElementById('banner-title').innerText = title;
+      document.getElementById('banner-tag').innerText = localStorage.getItem('banner_tag') || 'Новая коллекция';
+      document.getElementById('banner-title').innerText = localStorage.getItem('banner_title') || 'Весна-Лето 2026';
     }
 
     function loadBannerInputs() {
@@ -465,10 +423,8 @@
     }
 
     function saveBannerText() {
-      const tag = sanitize(document.getElementById('admin-banner-tag').value);
-      const title = sanitize(document.getElementById('admin-banner-title').value);
-      localStorage.setItem('banner_tag', tag);
-      localStorage.setItem('banner_title', title);
+      localStorage.setItem('banner_tag', sanitize(document.getElementById('admin-banner-tag').value));
+      localStorage.setItem('banner_title', sanitize(document.getElementById('admin-banner-title').value));
       loadBannerText();
       document.getElementById('banner-status').innerText = 'Текст успешно сохранен!';
       setTimeout(() => document.getElementById('banner-status').innerText = '', 2000);
@@ -479,47 +435,24 @@
       if (!p) return;
 
       const images = (p.images && p.images.length) ? p.images : ['https://picsum.photos/id/1011/400/400'];
-      const sizes = (p.sizes && p.sizes.length) ? p.sizes : [];
-      const colors = (p.colors && p.colors.length) ? p.colors : [];
+      const sizes = p.sizes || [];
+      const colors = p.colors || [];
 
-      let imgGalleryHTML = `
-        <div class="relative w-full aspect-[4/5] rounded-2xl overflow-hidden mb-3 bg-black">
-          <img id="main-sheet-img" src="${images[0]}" class="w-full h-full object-cover">
-        </div>
-      `;
-
+      let imgGalleryHTML = `<div class="relative w-full aspect-[4/5] rounded-2xl overflow-hidden mb-3 bg-black"><img id="main-sheet-img" src="${images[0]}" class="w-full h-full object-cover"></div>`;
       if (images.length > 1) {
         imgGalleryHTML += `<div class="flex gap-2 mb-4 overflow-x-auto no-scrollbar">`;
-        images.forEach((imgUrl) => {
-          imgGalleryHTML += `<img src="${imgUrl}" onclick="document.getElementById('main-sheet-img').src='${imgUrl}'" class="w-16 h-16 rounded-xl object-cover cursor-pointer border border-[#3a3a3a]">`;
-        });
+        images.forEach(imgUrl => { imgGalleryHTML += `<img src="${imgUrl}" onclick="document.getElementById('main-sheet-img').src='${imgUrl}'" class="w-16 h-16 rounded-xl object-cover cursor-pointer border border-[#3a3a3a]">`; });
         imgGalleryHTML += `</div>`;
       }
 
-      let sizesHTML = sizes.length ? `
-        <div class="mb-3">
-          <div class="text-xs mb-1.5" style="color: var(--tg-hint);">Выберите размер:</div>
-          <div id="selected-sizes" class="flex gap-2 flex-wrap">
-            ${sizes.map((s, idx) => `<button onclick="selectAttr('size', '${s}')" class="size-btn px-3.5 py-2 rounded-xl text-xs font-semibold border ${idx === 0 ? 'border-orange-500 bg-orange-500/10 text-orange-400' : 'border-[#3a3a3a]'}" style="color: var(--tg-text);">${s}</button>`).join('')}
-          </div>
-        </div>
-      ` : '';
-
-      let colorsHTML = colors.length ? `
-        <div class="mb-5">
-          <div class="text-xs mb-1.5" style="color: var(--tg-hint);">Выберите цвет:</div>
-          <div id="selected-colors" class="flex gap-2 flex-wrap">
-            ${colors.map((c, idx) => `<button onclick="selectAttr('color', '${c}')" class="color-btn px-3.5 py-2 rounded-xl text-xs font-semibold border ${idx === 0 ? 'border-orange-500 bg-orange-500/10 text-orange-400' : 'border-[#3a3a3a]'}" style="color: var(--tg-text);">${c}</button>`).join('')}
-          </div>
-        </div>
-      ` : '';
+      let sizesHTML = sizes.length ? `<div class="mb-3"><div class="text-xs mb-1.5" style="color: var(--tg-hint);">Выберите размер:</div><div class="flex gap-2 flex-wrap">${sizes.map((s, idx) => `<button onclick="selectAttr('size', '${s}')" class="size-btn px-3.5 py-2 rounded-xl text-xs font-semibold border ${idx === 0 ? 'border-orange-500 bg-orange-500/10 text-orange-400' : 'border-[#3a3a3a]'}" style="color: var(--tg-text);">${s}</button>`).join('')}</div></div>` : '';
+      let colorsHTML = colors.length ? `<div class="mb-5"><div class="text-xs mb-1.5" style="color: var(--tg-hint);">Выберите цвет:</div><div class="flex gap-2 flex-wrap">${colors.map((c, idx) => `<button onclick="selectAttr('color', '${c}')" class="color-btn px-3.5 py-2 rounded-xl text-xs font-semibold border ${idx === 0 ? 'border-orange-500 bg-orange-500/10 text-orange-400' : 'border-[#3a3a3a]'}" style="color: var(--tg-text);">${c}</button>`).join('')}</div></div>` : '';
 
       document.getElementById('sheet-content').innerHTML = `
         ${imgGalleryHTML}
         <div class="text-[14px] mb-1" style="color: var(--tg-hint);">${p.name || ''}</div>
         <div class="text-[24px] font-bold mb-4">${p.price || 0} ₸</div>
-        ${sizesHTML}
-        ${colorsHTML}
+        ${sizesHTML} ${colorsHTML}
         <button onclick="addToCartWithOptions('${p.id}')" class="btn-primary w-full py-3.5 text-base">Добавить в корзину</button>
       `;
 
@@ -534,28 +467,16 @@
       if (type === 'size') {
         window.chosenSize = val;
         document.querySelectorAll('.size-btn').forEach(b => {
-          if (b.innerText === val) {
-            b.style.borderColor = '#f97316';
-            b.style.background = 'rgba(249, 115, 22, 0.1)';
-            b.style.color = '#f97316';
-          } else {
-            b.style.borderColor = '#3a3a3a';
-            b.style.background = 'transparent';
-            b.style.color = 'var(--tg-text)';
-          }
+          b.style.borderColor = (b.innerText === val) ? '#f97316' : '#3a3a3a';
+          b.style.background = (b.innerText === val) ? 'rgba(249, 115, 22, 0.1)' : 'transparent';
+          b.style.color = (b.innerText === val) ? '#f97316' : 'var(--tg-text)';
         });
-      } else if (type === 'color') {
+      } else {
         window.chosenColor = val;
         document.querySelectorAll('.color-btn').forEach(b => {
-          if (b.innerText === val) {
-            b.style.borderColor = '#f97316';
-            b.style.background = 'rgba(249, 115, 22, 0.1)';
-            b.style.color = '#f97316';
-          } else {
-            b.style.borderColor = '#3a3a3a';
-            b.style.background = 'transparent';
-            b.style.color = 'var(--tg-text)';
-          }
+          b.style.borderColor = (b.innerText === val) ? '#f97316' : '#3a3a3a';
+          b.style.background = (b.innerText === val) ? 'rgba(249, 115, 22, 0.1)' : 'transparent';
+          b.style.color = (b.innerText === val) ? '#f97316' : 'var(--tg-text)';
         });
       }
     }
@@ -568,20 +489,13 @@
     function addToCartWithOptions(id) {
       const p = products.find(x => x.id === id);
       if (!p) return;
-
-      cart.push({
-        ...p,
-        size: window.chosenSize,
-        color: window.chosenColor
-      });
+      cart.push({ ...p, size: window.chosenSize, color: window.chosenColor });
       updateCartCount();
       closeSheet();
       showMsg('Товар добавлен в корзину!');
     }
 
-    function updateCartCount() {
-      document.getElementById('cart-count').innerText = cart.length;
-    }
+    function updateCartCount() { document.getElementById('cart-count').innerText = cart.length; }
 
     function showCart() {
       const container = document.getElementById('cart-items');
@@ -629,14 +543,12 @@
       showCart();
     }
 
+    // Безопасный чекауты через защищенный серверный API на Vercel
     async function checkout() {
       if (cart.length === 0) return;
 
-      const nameInput = document.getElementById('order-name');
-      const phoneInput = document.getElementById('order-phone');
-      
-      const name = sanitize(nameInput.value);
-      const phone = sanitize(phoneInput.value);
+      const name = sanitize(document.getElementById('order-name').value);
+      const phone = sanitize(document.getElementById('order-phone').value);
 
       if (!name || !phone) {
         showMsg('Заполните ваше имя и номер телефона');
@@ -654,50 +566,31 @@
 
       if (error) {
         showMsg('Ошибка оформления. Попробуйте позже.');
-        console.error(error);
         return;
       }
 
-      let itemsList = cart.map((item, index) => `${index + 1}. ${item.name} (Размер: ${item.size}, Цвет: ${item.color}) — ${item.price} ₸`).join('\n');
-      let message = `🔥 Новый заказ в Velutto Studio!\n\n` +
-                    `👤 Имя: ${name}\n` +
-                    `📞 Телефон: ${phone}\n\n` +
-                    `📦 Товары:\n${itemsList}\n\n` +
-                    `💰 Итого: ${total} ₸`;
-
-      // 3. Отправляем через Telegram Bot API (Диагностическая версия)
-      if (TELEGRAM_BOT_TOKEN) {
-        try {
-          const tgResponse = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: message })
-          });
-          
-          const tgResult = await tgResponse.json();
-          
-          if (!tgResponse.ok) {
-            alert("Ошибка Telegram: " + JSON.stringify(tgResult));
-          }
-        } catch (err) {
-          alert("Сетевая ошибка: " + err.message);
-        }
+      // Отправка через защищенный мост
+      try {
+        await fetch('/api/send-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, phone, cart, total })
+        });
+      } catch (err) {
+        console.error(err);
       }
 
       showMsg('Заказ успешно принят! Менеджер свяжется с вами.');
       cart = [];
-      nameInput.value = '';
-      phoneInput.value = '';
+      document.getElementById('order-name').value = '';
+      document.getElementById('order-phone').value = '';
       updateCartCount();
       hideCart();
     }
 
     function writeToManager() {
-      if (window.Telegram?.WebApp) {
-        window.Telegram.WebApp.openTelegramLink('https://t.me/Azhar_Suleimenova');
-      } else {
-        window.open('https://t.me/Azhar_Suleimenova', '_blank');
-      }
+      if (window.Telegram?.WebApp) window.Telegram.WebApp.openTelegramLink('https://t.me/Azhar_Suleimenova');
+      else window.open('https://t.me/Azhar_Suleimenova', '_blank');
     }
 
     async function loadAdminOrders() {
@@ -762,7 +655,6 @@
       document.getElementById('form-title').innerText = 'Редактировать товар';
       document.getElementById('save-btn').innerText = 'Сохранить изменения';
       document.getElementById('cancel-edit-btn').classList.remove('hidden');
-
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -776,7 +668,6 @@
       document.getElementById('admin-sizes').value = '';
       document.getElementById('admin-colors').value = '';
       document.getElementById('admin-photos').value = '';
-      
       document.getElementById('form-title').innerText = 'Добавить товар';
       document.getElementById('save-btn').innerText = 'Опубликовать товар';
       document.getElementById('cancel-edit-btn').classList.add('hidden');
@@ -796,10 +687,7 @@
       const price = parseFloat(document.getElementById('admin-price').value);
       
       const selectVal = document.getElementById('admin-category-select').value;
-      let category = selectVal;
-      if (selectVal === 'new') {
-        category = sanitize(document.getElementById('admin-category-custom').value);
-      }
+      let category = selectVal === 'new' ? sanitize(document.getElementById('admin-category-custom').value) : selectVal;
 
       const sizesStr = document.getElementById('admin-sizes').value;
       const colorsStr = document.getElementById('admin-colors').value;
@@ -843,7 +731,6 @@
       loadProducts();
     }
 
-    // Init
     loadProducts();
     updateCartCount();
   </script>

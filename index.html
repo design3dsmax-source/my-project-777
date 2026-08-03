@@ -569,3 +569,187 @@
         `👤 Имя: ${name}\n` +
         `📞 Телефон: ${phone}\n\n` +
         `📦 Товары:\n${itemsList}\n\n` +
+        `💰 Итого: ${total} ₸`;
+
+      const managerPhone = '77011258770';
+      const whatsappUrl = `https://wa.me/${managerPhone}?text=${encodeURIComponent(message)}`;
+
+      cart = [];
+      updateCartCount();
+
+      const container = document.getElementById('cart-items');
+      const checkoutForm = document.getElementById('checkout-form');
+      checkoutForm.classList.add('hidden');
+      document.getElementById('cart-total').innerText = '0 ₸';
+
+      container.innerHTML = `
+        <div class="text-center py-8 space-y-5">
+          <div class="text-4xl">✅</div>
+          <div class="text-xl font-bold">Заказ принят!</div>
+          <div class="text-sm px-2" style="color: var(--tg-hint);">
+            Нажмите кнопку, чтобы отправить заказ менеджеру в WhatsApp
+          </div>
+          <a href="${whatsappUrl}" target="_blank" rel="noopener"
+             class="btn-primary w-full py-4 text-base block text-center" id="wa-btn">
+            Отправить в WhatsApp
+          </a>
+        </div>
+      `;
+
+      const waBtn = document.getElementById('wa-btn');
+      if (waBtn) {
+        waBtn.onclick = function(e) {
+          e.preventDefault();
+          if (window.Telegram?.WebApp?.openLink) {
+            window.Telegram.WebApp.openLink(whatsappUrl);
+          } else {
+            window.open(whatsappUrl, '_blank');
+          }
+        };
+      }
+    }
+
+    function writeToManager() {
+      const url = 'https://wa.me/77011258770';
+      if (window.Telegram?.WebApp?.openLink) {
+        window.Telegram.WebApp.openLink(url);
+      } else {
+        window.open(url, '_blank');
+      }
+    }
+
+    async function loadAdminOrders() {
+      const container = document.getElementById('admin-orders-list');
+      container.innerHTML = `<div class="text-xs text-center" style="color: var(--tg-hint);">Загрузка заказов...</div>`;
+      const { data, error } = await db.from('orders').select('*').order('created_at', { ascending: false });
+      if (error || !data || !data.length) {
+        container.innerHTML = `<div class="text-xs text-center" style="color: var(--tg-hint);">Нет заказов</div>`;
+        return;
+      }
+      container.innerHTML = '';
+      data.forEach(ord => {
+        const el = document.createElement('div');
+        el.className = 'p-3 rounded-xl border text-xs space-y-1.5';
+        el.style.background = 'var(--tg-bg)';
+        el.style.borderColor = '#3a3a3a';
+        el.innerHTML = `
+          <div class="flex justify-between font-bold">
+            <span>Клиент: ${ord.user_email}</span>
+            <span style="color: var(--tg-button);">${ord.total_amount} ₸</span>
+          </div>
+          <div style="color: var(--tg-hint);">Статус: <b>${ord.status || 'Новый'}</b></div>
+          <div class="flex gap-2 pt-2">
+            <button onclick="updateOrderStatus('${ord.id}', 'В работе 🛠')" class="px-2 py-1 bg-blue-600 text-white rounded">В работу</button>
+            <button onclick="updateOrderStatus('${ord.id}', 'Выполнен ✅')" class="px-2 py-1 bg-green-600 text-white rounded">Выполнен</button>
+          </div>
+        `;
+        container.appendChild(el);
+      });
+    }
+
+    async function updateOrderStatus(id, newStatus) {
+      await db.from('orders').update({ status: newStatus }).eq('id', id);
+      showMsg('Статус обновлен!');
+      loadAdminOrders();
+    }
+
+    function startEdit(id) {
+      const p = products.find(x => x.id === id);
+      if (!p) return;
+      document.getElementById('edit-product-id').value = p.id;
+      document.getElementById('admin-name').value = p.name || '';
+      document.getElementById('admin-price').value = p.price || '';
+      const select = document.getElementById('admin-category-select');
+      const customInput = document.getElementById('admin-category-custom');
+      if (availableCategories.includes(p.category)) {
+        select.value = p.category;
+        customInput.classList.add('hidden');
+      } else {
+        select.value = 'new';
+        customInput.value = p.category || '';
+        customInput.classList.remove('hidden');
+      }
+      document.getElementById('admin-sizes').value = p.sizes ? p.sizes.join(', ') : '';
+      document.getElementById('admin-colors').value = p.colors ? p.colors.join(', ') : '';
+      document.getElementById('form-title').innerText = 'Редактировать товар';
+      document.getElementById('save-btn').innerText = 'Сохранить изменения';
+      document.getElementById('cancel-edit-btn').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetForm() {
+      document.getElementById('edit-product-id').value = '';
+      document.getElementById('admin-name').value = '';
+      document.getElementById('admin-price').value = '';
+      document.getElementById('admin-category-select').value = availableCategories[0] || 'Платья';
+      document.getElementById('admin-category-custom').classList.add('hidden');
+      document.getElementById('admin-category-custom').value = '';
+      document.getElementById('admin-sizes').value = '';
+      document.getElementById('admin-colors').value = '';
+      document.getElementById('admin-photos').value = '';
+      document.getElementById('form-title').innerText = 'Добавить товар';
+      document.getElementById('save-btn').innerText = 'Опубликовать товар';
+      document.getElementById('cancel-edit-btn').classList.add('hidden');
+      document.getElementById('admin-status').innerText = '';
+    }
+
+    async function deleteProduct(id) {
+      if (!confirm('Удалить этот товар?')) return;
+      await db.from('products').delete().eq('id', id);
+      showMsg('Товар удален');
+      loadProducts();
+    }
+
+    async function saveProduct() {
+      const editId = document.getElementById('edit-product-id').value;
+      const name = sanitize(document.getElementById('admin-name').value);
+      const price = parseFloat(document.getElementById('admin-price').value);
+      const selectVal = document.getElementById('admin-category-select').value;
+      let category = selectVal === 'new' ? sanitize(document.getElementById('admin-category-custom').value) : selectVal;
+      const sizesStr = document.getElementById('admin-sizes').value;
+      const colorsStr = document.getElementById('admin-colors').value;
+      const fileInput = document.getElementById('admin-photos');
+      const status = document.getElementById('admin-status');
+
+      if (!name || !price || !category) {
+        status.innerText = 'Заполните название, цену и категорию';
+        return;
+      }
+
+      status.innerText = 'Загрузка фото и сохранение...';
+      let imageUrls = [];
+
+      if (fileInput.files.length > 0) {
+        for (let i = 0; i < Math.min(fileInput.files.length, 3); i++) {
+          const file = fileInput.files[i];
+          const fileName = `${Date.now()}_${i}.${file.name.split('.').pop()}`;
+          const { error: uploadError } = await db.storage.from('product-images').upload(fileName, file);
+          if (!uploadError) {
+            const { data: { publicUrl } } = db.storage.from('product-images').getPublicUrl(fileName);
+            imageUrls.push(publicUrl);
+          }
+        }
+      }
+
+      const sizes = sizesStr ? sizesStr.split(',').map(s => s.trim()).filter(Boolean) : [];
+      const colors = colorsStr ? colorsStr.split(',').map(c => c.trim()).filter(Boolean) : [];
+
+      if (editId) {
+        const updateData = { name, price, category, sizes, colors };
+        if (imageUrls.length > 0) updateData.images = imageUrls;
+        await db.from('products').update(updateData).eq('id', editId);
+        status.innerText = 'Товар обновлен!';
+      } else {
+        await db.from('products').insert([{ name, price, category, images: imageUrls, sizes, colors }]);
+        status.innerText = 'Товар добавлен!';
+      }
+
+      resetForm();
+      loadProducts();
+    }
+
+    loadProducts();
+    updateCartCount();
+  </script>
+</body>
+</html>

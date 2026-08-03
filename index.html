@@ -571,13 +571,17 @@
 
       // Отправка через защищенный мост
       try {
-        await fetch('/api/send-order', {
+        const res = await fetch('/api/send-order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, phone, cart, total })
         });
+        const result = await res.json();
+        if (!res.ok) {
+          alert("Серверная ошибка: " + (result.error || JSON.stringify(result)));
+        }
       } catch (err) {
-        console.error(err);
+        alert("Ошибка сети при отправке: " + err.message);
       }
 
       showMsg('Заказ успешно принят! Менеджер свяжется с вами.');

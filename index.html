@@ -631,17 +631,22 @@
     }
 
     async function checkout() {
-      if (cart.length === 0) return;
-
-      const nameInput = document.getElementById('order-name');
-      const phoneInput = document.getElementById('order-phone');
-      
-      const name = sanitize(nameInput.value);
-      const phone = sanitize(phoneInput.value);
-
-      if (!name || !phone) {
-        showMsg('Заполните ваше имя и номер телефона');
-        return;
+        try {
+          const tgResponse = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: message })
+          });
+          
+          const tgResult = await tgResponse.json();
+          
+          if (!tgResponse.ok) {
+            // Если Telegram отклонил сообщение, покажем точную ошибку на экране
+            alert("Ошибка Telegram: " + JSON.stringify(tgResult));
+          }
+        } catch (err) {
+          alert("Сетевая ошибка: " + err.message);
+        }
       }
 
       const total = cart.reduce((s, i) => s + (Number(i.price) || 0), 0);

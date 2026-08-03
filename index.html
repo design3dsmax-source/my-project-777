@@ -543,10 +543,8 @@
       showCart();
     }
 
-    // Оформление заказа с диагностикой
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ ОФОРМЛЕНИЯ ЗАКАЗА
     async function checkout() {
-      alert("Кнопка нажата!"); // Диагностика срабатывания
-
       if (cart.length === 0) {
         showMsg('Корзина пуста');
         return;
@@ -565,9 +563,12 @@
 
       const total = cart.reduce((s, i) => s + (Number(i.price) || 0), 0);
 
+      // Сохраняем копию товаров в переменную ДО очистки корзины
+      const currentCart = [...cart];
+
       const { error } = await db.from('orders').insert([{
         user_email: `${name} | ${phone}`,
-        items: cart,
+        items: currentCart,
         total_amount: total,
         status: 'Новый ⏳'
       }]);
@@ -577,7 +578,7 @@
         return;
       }
 
-      let itemsList = cart.map((item, index) => `${index + 1}. ${item.name} (Размер: ${item.size}, Цвет: ${item.color}) — ${item.price} ₸`).join('\n');
+      let itemsList = currentCart.map((item, index) => `${index + 1}. ${item.name} (Размер: ${item.size}, Цвет: ${item.color}) — ${item.price} ₸`).join('\n');
       let message = `🔥 Новый заказ в Velutto Studio!\n\n` +
                     `👤 Имя: ${name}\n` +
                     `📞 Телефон: ${phone}\n\n` +
@@ -587,27 +588,42 @@
       const managerPhone = '77011258770'; 
       const whatsappUrl = `https://wa.me/${managerPhone}?text=${encodeURIComponent(message)}`;
 
+      // Очищаем корзину только после формирования сообщения
       cart = [];
       if (nameField) nameField.value = '';
       if (phoneField) phoneField.value = '';
       updateCartCount();
       hideCart();
 
+      // Показываем кнопку для отправки в WhatsApp с обходом блокировки Telegram
       document.getElementById('sheet-content').innerHTML = `
         <div class="text-center py-6 space-y-4">
           <div class="text-xl font-bold text-green-500">Заказ успешно принят! 🎉</div>
           <div class="text-xs" style="color: var(--tg-hint);">Нажмите на кнопку ниже, чтобы отправить детали заказа менеджеру в WhatsApp:</div>
-          <a href="${whatsappUrl}" target="_blank" class="btn-primary block w-full py-3.5 text-center text-base no-underline">
+          <button onclick="openWhatsApp('${whatsappUrl}')" class="btn-primary w-full py-3.5 text-center text-base">
             Открыть WhatsApp 📱
-          </a>
+          </button>
         </div>
       `;
       document.getElementById('cart-overlay').classList.remove('hidden');
       document.getElementById('cart-sheet').classList.add('open');
     }
 
+    function openWhatsApp(url) {
+      if (window.Telegram?.WebApp && window.Telegram.WebApp.openLink) {
+        window.Telegram.WebApp.openLink(url);
+      } else {
+        window.open(url, '_blank');
+      }
+    }
+
     function writeToManager() {
-      window.open('https://wa.me/77011258770', '_blank');
+      const url = 'https://wa.me/77011258770';
+      if (window.Telegram?.WebApp && window.Telegram.WebApp.openLink) {
+        window.Telegram.WebApp.openLink(url);
+      } else {
+        window.open(url, '_blank');
+      }
     }
 
     async function loadAdminOrders() {

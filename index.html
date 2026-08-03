@@ -543,12 +543,20 @@
       showCart();
     }
 
-    // Сохранение заказа в Supabase и генерация кнопки для WhatsApp
+    // Оформление заказа с диагностикой
     async function checkout() {
-      if (cart.length === 0) return;
+      alert("Кнопка нажата!"); // Диагностика срабатывания
 
-      const name = sanitize(document.getElementById('order-name').value);
-      const phone = sanitize(document.getElementById('order-phone').value);
+      if (cart.length === 0) {
+        showMsg('Корзина пуста');
+        return;
+      }
+
+      const nameField = document.getElementById('order-name');
+      const phoneField = document.getElementById('order-phone');
+
+      const name = sanitize(nameField ? nameField.value : '');
+      const phone = sanitize(phoneField ? phoneField.value : '');
 
       if (!name || !phone) {
         showMsg('Заполните ваше имя и номер телефона');
@@ -565,7 +573,7 @@
       }]);
 
       if (error) {
-        showMsg('Ошибка оформления. Попробуйте позже.');
+        showMsg('Ошибка базы данных: ' + error.message);
         return;
       }
 
@@ -580,8 +588,8 @@
       const whatsappUrl = `https://wa.me/${managerPhone}?text=${encodeURIComponent(message)}`;
 
       cart = [];
-      document.getElementById('order-name').value = '';
-      document.getElementById('order-phone').value = '';
+      if (nameField) nameField.value = '';
+      if (phoneField) phoneField.value = '';
       updateCartCount();
       hideCart();
 

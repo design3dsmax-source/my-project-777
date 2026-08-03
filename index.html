@@ -543,7 +543,7 @@
       showCart();
     }
 
-    // Оформление заказа и переход в WhatsApp с вашим номером
+    // Сохранение заказа в Supabase и генерация кнопки для WhatsApp
     async function checkout() {
       if (cart.length === 0) return;
 
@@ -557,7 +557,6 @@
 
       const total = cart.reduce((s, i) => s + (Number(i.price) || 0), 0);
 
-      // Сохраняем в Supabase
       const { error } = await db.from('orders').insert([{
         user_email: `${name} | ${phone}`,
         items: cart,
@@ -570,7 +569,6 @@
         return;
       }
 
-      // Текст сообщения для WhatsApp
       let itemsList = cart.map((item, index) => `${index + 1}. ${item.name} (Размер: ${item.size}, Цвет: ${item.color}) — ${item.price} ₸`).join('\n');
       let message = `🔥 Новый заказ в Velutto Studio!\n\n` +
                     `👤 Имя: ${name}\n` +
@@ -581,20 +579,18 @@
       const managerPhone = '77011258770'; 
       const whatsappUrl = `https://wa.me/${managerPhone}?text=${encodeURIComponent(message)}`;
 
-      // Очищаем корзину
       cart = [];
       document.getElementById('order-name').value = '';
       document.getElementById('order-phone').value = '';
       updateCartCount();
       hideCart();
 
-      // Показываем пользователю кнопку для перехода в WhatsApp (обходит блокировку браузеров)
       document.getElementById('sheet-content').innerHTML = `
         <div class="text-center py-6 space-y-4">
           <div class="text-xl font-bold text-green-500">Заказ успешно принят! 🎉</div>
           <div class="text-xs" style="color: var(--tg-hint);">Нажмите на кнопку ниже, чтобы отправить детали заказа менеджеру в WhatsApp:</div>
           <a href="${whatsappUrl}" target="_blank" class="btn-primary block w-full py-3.5 text-center text-base no-underline">
-            Отправить в WhatsApp 📱
+            Открыть WhatsApp 📱
           </a>
         </div>
       `;

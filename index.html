@@ -74,7 +74,7 @@
   <!-- Promo Banner -->
   <div class="px-4 pt-4">
     <div class="relative w-full aspect-[21/9] rounded-2xl overflow-hidden shadow-lg border" style="border-color: #2a2a2a; background: var(--tg-secondary);">
-      <video src="https://assets.mixkit.co/videos/preview/mixkit-stylish-woman-walking-with-shopping-bags-41443-large.mp4" 
+      <video src="https://assets.mixkit.co/videos/preview/mixkit-stylish-woman-walking-with-shopping-bags-41443-large.mp4"
              autoplay muted loop playsinline class="w-full h-full object-cover">
       </video>
       <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-3">
@@ -92,7 +92,6 @@
            class="w-full px-4 py-3 rounded-2xl text-sm outline-none"
            style="background: var(--tg-secondary); color: var(--tg-text); border: none;"
            oninput="filterProducts()">
-
     <div id="categories-container" class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
       <button onclick="filterByCategory('Все')" class="cat-btn px-4 py-2 rounded-xl text-xs font-medium whitespace-nowrap" style="background: var(--tg-button); color: var(--tg-button-text);">Все</button>
     </div>
@@ -101,13 +100,11 @@
   <!-- Admin Panel -->
   <div id="admin-panel" class="hidden px-4 pt-4">
     <div class="rounded-2xl p-4 mb-4 space-y-4" style="background: var(--tg-secondary);">
-      
       <div id="admin-auth">
         <div class="font-semibold mb-3">Вход в панель управления</div>
         <input id="admin-pass-input" type="password" placeholder="Пароль" class="w-full mb-3 px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
         <button onclick="checkAdminPass()" class="btn-primary w-full py-3 text-sm">Войти</button>
       </div>
-
       <div id="admin-content" class="hidden space-y-5">
         <div class="flex rounded-xl p-1 gap-1" style="background: var(--tg-bg);">
           <button onclick="switchAdminTab('products')" id="tab-prod-btn" class="flex-1 py-2 text-xs font-semibold rounded-lg" style="background: var(--tg-button); color: var(--tg-button-text);">Товары</button>
@@ -121,11 +118,9 @@
             <div id="form-title" class="font-semibold text-sm">Добавить товар</div>
             <button id="cancel-edit-btn" onclick="resetForm()" class="text-xs hidden" style="color: #ef4444;">Отмена</button>
           </div>
-          
           <input id="edit-product-id" type="hidden">
           <input id="admin-name" type="text" placeholder="Название" class="w-full px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
           <input id="admin-price" type="number" placeholder="Цена (₸)" class="w-full px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
-          
           <div class="space-y-2">
             <div class="text-xs" style="color: var(--tg-hint);">Категория товара:</div>
             <select id="admin-category-select" onchange="onCategorySelectChange()" class="w-full px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
@@ -137,15 +132,12 @@
             </select>
             <input id="admin-category-custom" type="text" placeholder="Введите название новой категории" class="w-full px-3 py-2.5 rounded-xl text-sm outline-none hidden" style="background: var(--tg-bg); color: var(--tg-text);">
           </div>
-
           <input id="admin-sizes" type="text" placeholder="Размеры через запятую (S, M, L)" class="w-full px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
           <input id="admin-colors" type="text" placeholder="Цвета через запятую (чёрный, белый)" class="w-full px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
-          
           <div class="space-y-1">
             <div class="text-xs" style="color: var(--tg-hint);">Загрузите до 3 фотографий товара:</div>
             <input type="file" id="admin-photos" accept="image/*" multiple class="w-full text-sm" style="border: none;">
           </div>
-
           <button id="save-btn" onclick="saveProduct()" class="btn-primary w-full py-3 text-sm">Опубликовать товар</button>
           <div id="admin-status" class="text-sm text-center" style="color: var(--tg-hint);"></div>
         </div>
@@ -164,9 +156,7 @@
           <div class="font-semibold text-sm">Список заказов</div>
           <div id="admin-orders-list" class="space-y-3 max-h-96 overflow-y-auto"></div>
         </div>
-
       </div>
-
     </div>
   </div>
 
@@ -179,7 +169,7 @@
   <!-- Products Grid -->
   <div id="products-grid" class="p-4 grid grid-cols-2 gap-3"></div>
 
-  <!-- Bottom Sheet -->
+  <!-- Bottom Sheet (товар) -->
   <div id="sheet-overlay" class="fixed inset-0 bg-black/60 z-50 hidden" onclick="closeSheet()"></div>
   <div id="bottom-sheet" class="bottom-sheet fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl p-5 max-h-[85vh] overflow-auto" style="background: var(--tg-bg);">
     <div class="w-10 h-1 rounded-full mx-auto mb-4" style="background: #3a3a3a;"></div>
@@ -194,14 +184,12 @@
       <button onclick="hideCart()" class="text-3xl leading-none" style="color: var(--tg-hint);">×</button>
     </div>
     <div id="cart-items" class="space-y-3 mb-6"></div>
-    
     <div class="border-t pt-4" style="border-color: #2a2a2a;">
       <div id="checkout-form" class="mb-5 space-y-3 hidden">
         <div class="text-sm font-semibold mb-2" style="color: var(--tg-hint);">Контактные данные</div>
         <input id="order-name" type="text" placeholder="Ваше имя" class="w-full px-3 py-3 rounded-xl text-sm outline-none" style="background: var(--tg-secondary); color: var(--tg-text);">
         <input id="order-phone" type="tel" placeholder="Номер телефона" class="w-full px-3 py-3 rounded-xl text-sm outline-none" style="background: var(--tg-secondary); color: var(--tg-text);">
       </div>
-
       <div class="flex justify-between text-lg font-semibold mb-4">
         <span>Итого</span>
         <span id="cart-total">0 ₸</span>
@@ -216,9 +204,7 @@
   <script>
     const SUPABASE_URL = 'https://zvzzbwfmjfjbffyclyws.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_ufJvMq3VX9sq2_bDnsW1OQ_FSclYUap';
-
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
     const ADMIN_PASSWORD = 'velutto2026';
     let isAdminLoggedIn = false;
     let products = [];
@@ -248,7 +234,9 @@
       return String(str).replace(/[<>\"']/g, '').trim().slice(0, 300);
     }
 
-    function toggleAdmin() { document.getElementById('admin-panel').classList.toggle('hidden'); }
+    function toggleAdmin() {
+      document.getElementById('admin-panel').classList.toggle('hidden');
+    }
 
     function checkAdminPass() {
       const pass = document.getElementById('admin-pass-input').value;
@@ -341,7 +329,6 @@
     function renderCategoryButtons() {
       const container = document.getElementById('categories-container');
       let html = `<button onclick="filterByCategory('Все')" class="cat-btn px-4 py-2 rounded-xl text-xs font-medium whitespace-nowrap" style="background: ${currentCategory === 'Все' ? 'var(--tg-button)' : 'var(--tg-secondary)'}; color: ${currentCategory === 'Все' ? 'var(--tg-button-text)' : 'var(--tg-hint)'};">Все</button>`;
-      
       availableCategories.forEach(cat => {
         const isActive = (currentCategory === cat);
         html += `<button onclick="filterByCategory('${cat}')" class="cat-btn px-4 py-2 rounded-xl text-xs font-medium whitespace-nowrap" style="background: ${isActive ? 'var(--tg-button)' : 'var(--tg-secondary)'}; color: ${isActive ? 'var(--tg-button-text)' : 'var(--tg-hint)'};">${cat}</button>`;
@@ -368,7 +355,6 @@
     function renderProducts(list) {
       const grid = document.getElementById('products-grid');
       grid.innerHTML = '';
-
       if (!list.length) {
         grid.innerHTML = `<div class="col-span-2 text-center py-10" style="color: var(--tg-hint);">Товары не найдены</div>`;
         return;
@@ -441,7 +427,9 @@
       let imgGalleryHTML = `<div class="relative w-full aspect-[4/5] rounded-2xl overflow-hidden mb-3 bg-black"><img id="main-sheet-img" src="${images[0]}" class="w-full h-full object-cover"></div>`;
       if (images.length > 1) {
         imgGalleryHTML += `<div class="flex gap-2 mb-4 overflow-x-auto no-scrollbar">`;
-        images.forEach(imgUrl => { imgGalleryHTML += `<img src="${imgUrl}" onclick="document.getElementById('main-sheet-img').src='${imgUrl}'" class="w-16 h-16 rounded-xl object-cover cursor-pointer border border-[#3a3a3a]">`; });
+        images.forEach(imgUrl => {
+          imgGalleryHTML += `<img src="${imgUrl}" onclick="document.getElementById('main-sheet-img').src='${imgUrl}'" class="w-16 h-16 rounded-xl object-cover cursor-pointer border border-[#3a3a3a]">`;
+        });
         imgGalleryHTML += `</div>`;
       }
 
@@ -495,7 +483,9 @@
       showMsg('Товар добавлен в корзину!');
     }
 
-    function updateCartCount() { document.getElementById('cart-count').innerText = cart.length; }
+    function updateCartCount() {
+      document.getElementById('cart-count').innerText = cart.length;
+    }
 
     function showCart() {
       const container = document.getElementById('cart-items');
@@ -518,7 +508,7 @@
             <img src="${img}" class="w-14 h-14 rounded-xl object-cover flex-shrink-0">
             <div class="flex-1 min-w-0">
               <div class="text-sm font-medium truncate">${item.name || ''}</div>
-              <div class="text-xs" style="color: var(--tg-hint);">Размер: ${item.size} | Цвет: ${item.color}</div>
+              <div class="text-xs" style="color: var(--tg-hint);">Размер: ${item.size || '—'} | Цвет: ${item.color || '—'}</div>
               <div class="text-[15px] font-bold" style="color: var(--tg-button);">${item.price || 0} ₸</div>
             </div>
             <button onclick="removeFromCart(${i})" class="text-xl px-2" style="color: #ef4444;">×</button>
@@ -552,7 +542,6 @@
 
       const nameField = document.getElementById('order-name');
       const phoneField = document.getElementById('order-phone');
-
       const name = sanitize(nameField ? nameField.value : '');
       const phone = sanitize(phoneField ? phoneField.value : '');
 
@@ -562,8 +551,6 @@
       }
 
       const total = cart.reduce((s, i) => s + (Number(i.price) || 0), 0);
-
-      // Сохраняем копию товаров в переменную ДО очистки корзины
       const currentCart = [...cart];
 
       const { error } = await db.from('orders').insert([{
@@ -578,48 +565,48 @@
         return;
       }
 
-      let itemsList = currentCart.map((item, index) => `${index + 1}. ${item.name} (Размер: ${item.size}, Цвет: ${item.color}) — ${item.price} ₸`).join('\n');
-      let message = `🔥 Новый заказ в Velutto Studio!\n\n` +
-                    `👤 Имя: ${name}\n` +
-                    `📞 Телефон: ${phone}\n\n` +
-                    `📦 Товары:\n${itemsList}\n\n` +
-                    `💰 Итого: ${total} ₸`;
+      let itemsList = currentCart.map((item, index) =>
+        `${index + 1}. ${item.name} (Размер: ${item.size || '—'}, Цвет: ${item.color || '—'}) — ${item.price} ₸`
+      ).join('\n');
 
-      const managerPhone = '77011258770'; 
+      let message =
+        `🔥 Новый заказ Velutto Studio\n\n` +
+        `👤 Имя: ${name}\n` +
+        `📞 Телефон: ${phone}\n\n` +
+        `📦 Товары:\n${itemsList}\n\n` +
+        `💰 Итого: ${total} ₸`;
+
+      const managerPhone = '77011258770';
       const whatsappUrl = `https://wa.me/${managerPhone}?text=${encodeURIComponent(message)}`;
 
-      // Очищаем корзину только после формирования сообщения
       cart = [];
       if (nameField) nameField.value = '';
       if (phoneField) phoneField.value = '';
       updateCartCount();
       hideCart();
 
-      // Показываем кнопку для отправки в WhatsApp с обходом блокировки Telegram
       document.getElementById('sheet-content').innerHTML = `
-        <div class="text-center py-6 space-y-4">
-          <div class="text-xl font-bold text-green-500">Заказ успешно принят! 🎉</div>
-          <div class="text-xs" style="color: var(--tg-hint);">Нажмите на кнопку ниже, чтобы отправить детали заказа менеджеру в WhatsApp:</div>
-          <button onclick="openWhatsApp('${whatsappUrl}')" class="btn-primary w-full py-3.5 text-center text-base">
-            Открыть WhatsApp 📱
-          </button>
+        <div class="text-center py-8 space-y-5">
+          <div class="text-2xl">✅</div>
+          <div class="text-xl font-bold">Заказ принят!</div>
+          <div class="text-sm" style="color: var(--tg-hint);">
+            Нажмите кнопку ниже, чтобы отправить заказ менеджеру в WhatsApp
+          </div>
+          <a href="${whatsappUrl}" target="_blank"
+             class="btn-primary w-full py-4 text-base block text-center"
+             onclick="if(window.Telegram?.WebApp?.openLink){window.Telegram.WebApp.openLink('${whatsappUrl}'); return false;}">
+            Отправить в WhatsApp
+          </a>
         </div>
       `;
-      document.getElementById('cart-overlay').classList.remove('hidden');
-      document.getElementById('cart-sheet').classList.add('open');
-    }
 
-    function openWhatsApp(url) {
-      if (window.Telegram?.WebApp && window.Telegram.WebApp.openLink) {
-        window.Telegram.WebApp.openLink(url);
-      } else {
-        window.open(url, '_blank');
-      }
+      document.getElementById('sheet-overlay').classList.remove('hidden');
+      document.getElementById('bottom-sheet').classList.add('open');
     }
 
     function writeToManager() {
       const url = 'https://wa.me/77011258770';
-      if (window.Telegram?.WebApp && window.Telegram.WebApp.openLink) {
+      if (window.Telegram?.WebApp?.openLink) {
         window.Telegram.WebApp.openLink(url);
       } else {
         window.open(url, '_blank');
@@ -629,13 +616,11 @@
     async function loadAdminOrders() {
       const container = document.getElementById('admin-orders-list');
       container.innerHTML = `<div class="text-xs text-center" style="color: var(--tg-hint);">Загрузка заказов...</div>`;
-
       const { data, error } = await db.from('orders').select('*').order('created_at', { ascending: false });
-      if (error || !data.length) {
+      if (error || !data || !data.length) {
         container.innerHTML = `<div class="text-xs text-center" style="color: var(--tg-hint);">Нет заказов</div>`;
         return;
       }
-
       container.innerHTML = '';
       data.forEach(ord => {
         const el = document.createElement('div');
@@ -666,11 +651,9 @@
     function startEdit(id) {
       const p = products.find(x => x.id === id);
       if (!p) return;
-
       document.getElementById('edit-product-id').value = p.id;
       document.getElementById('admin-name').value = p.name || '';
       document.getElementById('admin-price').value = p.price || '';
-      
       const select = document.getElementById('admin-category-select');
       const customInput = document.getElementById('admin-category-custom');
       if (availableCategories.includes(p.category)) {
@@ -681,10 +664,8 @@
         customInput.value = p.category || '';
         customInput.classList.remove('hidden');
       }
-
       document.getElementById('admin-sizes').value = p.sizes ? p.sizes.join(', ') : '';
       document.getElementById('admin-colors').value = p.colors ? p.colors.join(', ') : '';
-      
       document.getElementById('form-title').innerText = 'Редактировать товар';
       document.getElementById('save-btn').innerText = 'Сохранить изменения';
       document.getElementById('cancel-edit-btn').classList.remove('hidden');
@@ -718,10 +699,8 @@
       const editId = document.getElementById('edit-product-id').value;
       const name = sanitize(document.getElementById('admin-name').value);
       const price = parseFloat(document.getElementById('admin-price').value);
-      
       const selectVal = document.getElementById('admin-category-select').value;
       let category = selectVal === 'new' ? sanitize(document.getElementById('admin-category-custom').value) : selectVal;
-
       const sizesStr = document.getElementById('admin-sizes').value;
       const colorsStr = document.getElementById('admin-colors').value;
       const fileInput = document.getElementById('admin-photos');
@@ -733,10 +712,10 @@
       }
 
       status.innerText = 'Загрузка фото и сохранение...';
-
       let imageUrls = [];
+
       if (fileInput.files.length > 0) {
-        for (let i = 0; i < fileInput.files.length; i++) {
+        for (let i = 0; i < Math.min(fileInput.files.length, 3); i++) {
           const file = fileInput.files[i];
           const fileName = `${Date.now()}_${i}.${file.name.split('.').pop()}`;
           const { error: uploadError } = await db.storage.from('product-images').upload(fileName, file);
@@ -764,6 +743,7 @@
       loadProducts();
     }
 
+    // Init
     loadProducts();
     updateCartCount();
   </script>

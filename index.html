@@ -37,7 +37,6 @@
       transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
     }
     .bottom-sheet.open { transform: translateY(0); }
-<<<<<<< HEAD
     .skeleton {
       background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
       background-size: 200% 100%;
@@ -51,11 +50,6 @@
     input:focus, select:focus { border-color: var(--tg-button); }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-=======
-    .checkmark { display: none; }
-    .btn-success .btn-text { display: none; }
-    .btn-success .checkmark { display: inline; }
->>>>>>> 8b0fef7 (add api route)
   </style>
 </head>
 <body>
@@ -79,7 +73,6 @@
 
   <!-- Promo Banner -->
   <div class="px-4 pt-4">
-<<<<<<< HEAD
     <div class="relative w-full aspect-[21/9] rounded-2xl overflow-hidden shadow-lg border" style="border-color: #2a2a2a; background: var(--tg-secondary);">
       <video src="https://assets.mixkit.co/videos/preview/mixkit-stylish-woman-walking-with-shopping-bags-41443-large.mp4" 
              autoplay muted loop playsinline class="w-full h-full object-cover">
@@ -184,33 +177,6 @@
   </div>
 
   <!-- Products Grid -->
-=======
-    <input id="search" type="text" placeholder="Поиск по коллекции..."
-           class="w-full px-4 py-3 rounded-2xl text-sm outline-none"
-           style="background: var(--tg-secondary); color: var(--tg-text);"
-           oninput="filterProducts()">
-  </div>
-
-  <!-- Admin Panel -->
-  <div id="admin-panel" class="hidden px-4 pt-4">
-    <div class="rounded-2xl p-4 mb-4" style="background: var(--tg-secondary);">
-      <div class="font-semibold mb-3">Добавить товар</div>
-      <input id="admin-name" type="text" placeholder="Название" class="w-full mb-2 px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
-      <input id="admin-price" type="number" placeholder="Цена" class="w-full mb-2 px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
-      <input id="admin-sizes" type="text" placeholder="Размеры (S, M, L)" class="w-full mb-2 px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
-      <input id="admin-colors" type="text" placeholder="Цвета (чёрный, белый)" class="w-full mb-2 px-3 py-2.5 rounded-xl text-sm outline-none" style="background: var(--tg-bg); color: var(--tg-text);">
-      
-      <div class="mb-3">
-        <input type="file" id="admin-photo" accept="image/*" class="w-full text-sm">
-      </div>
-      
-      <button onclick="addProduct()" class="btn-primary w-full py-3 text-sm">Добавить товар</button>
-      <div id="admin-status" class="text-sm mt-2 text-center" style="color: var(--tg-hint);"></div>
-    </div>
-  </div>
-
-  <!-- Products -->
->>>>>>> 8b0fef7 (add api route)
   <div id="products-grid" class="p-4 grid grid-cols-2 gap-3"></div>
 
   <!-- Bottom Sheet -->
@@ -251,7 +217,6 @@
     const SUPABASE_URL = 'https://zvzzbwfmjfjbffyclyws.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_ufJvMq3VX9sq2_bDnsW1OQ_FSclYUap';
 
-<<<<<<< HEAD
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const ADMIN_PASSWORD = 'velutto2026';
@@ -260,12 +225,6 @@
     let cart = [];
     let currentCategory = 'Все';
     let availableCategories = ['Платья', 'Костюмы', 'Верхняя одежда', 'Аксессуары'];
-=======
-    const ADMIN_PASSWORD = 'velutto2026'; // пароль админки
-    let isAdmin = false;
-    let products = [];
-    let cart = [];
->>>>>>> 8b0fef7 (add api route)
 
     if (window.Telegram?.WebApp) {
       const tg = window.Telegram.WebApp;
@@ -279,20 +238,16 @@
       document.documentElement.style.setProperty('--tg-secondary', tg.themeParams.secondary_bg_color || '#1c1c1e');
     }
 
-<<<<<<< HEAD
     function showMsg(text) {
       if (window.Telegram?.WebApp) window.Telegram.WebApp.showAlert(text);
       else alert(text);
     }
 
-=======
->>>>>>> 8b0fef7 (add api route)
     function sanitize(str) {
       if (!str) return '';
       return String(str).replace(/[<>\"']/g, '').trim().slice(0, 300);
     }
 
-<<<<<<< HEAD
     function toggleAdmin() { document.getElementById('admin-panel').classList.toggle('hidden'); }
 
     function checkAdminPass() {
@@ -344,25 +299,10 @@
         customInput.focus();
       } else {
         customInput.classList.add('hidden');
-=======
-    function toggleAdmin() {
-      if (isAdmin) {
-        isAdmin = false;
-        document.getElementById('admin-panel').classList.add('hidden');
-        return;
-      }
-      const pass = prompt('Введите пароль админа:');
-      if (pass === ADMIN_PASSWORD) {
-        isAdmin = true;
-        document.getElementById('admin-panel').classList.remove('hidden');
-      } else {
-        alert('Неверный пароль');
->>>>>>> 8b0fef7 (add api route)
       }
     }
 
     async function loadProducts() {
-<<<<<<< HEAD
       const skeleton = document.getElementById('skeleton');
       const grid = document.getElementById('products-grid');
       skeleton.classList.remove('hidden');
@@ -370,12 +310,6 @@
 
       const { data, error } = await db.from('products').select('*').order('created_at', { ascending: false });
       skeleton.classList.add('hidden');
-=======
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .order('created_at', { ascending: false });
->>>>>>> 8b0fef7 (add api route)
 
       if (error) {
         grid.innerHTML = `<div class="col-span-2 text-center py-10" style="color: var(--tg-hint);">Ошибка загрузки товаров</div>`;
@@ -443,11 +377,7 @@
       list.forEach(p => {
         const img = (p.images && p.images[0]) ? p.images[0] : 'https://picsum.photos/id/1011/400/400';
         const card = document.createElement('div');
-<<<<<<< HEAD
         card.className = 'rounded-2xl overflow-hidden border flex flex-col justify-between';
-=======
-        card.className = 'rounded-2xl overflow-hidden border';
->>>>>>> 8b0fef7 (add api route)
         card.style.background = 'var(--tg-secondary)';
         card.style.borderColor = '#2a2a2a';
 
@@ -471,20 +401,11 @@
               </div>
             </div>
           </div>
-<<<<<<< HEAD
           <div>
             ${adminButtons}
             <div class="px-3 pb-3">
               <button onclick="openSheet('${p.id}')" class="btn-primary w-full py-2.5 text-sm flex items-center justify-center gap-2"><span>В корзину</span></button>
             </div>
-=======
-          <div class="px-3 pb-3">
-            <button id="btn-${p.id}" onclick="event.stopPropagation(); addToCart(${p.id})"
-                    class="btn-primary w-full py-2.5 text-sm flex items-center justify-center gap-2">
-              <span class="btn-text">В корзину</span>
-              <span class="checkmark">✓</span>
-            </button>
->>>>>>> 8b0fef7 (add api route)
           </div>
         `;
         grid.appendChild(card);
@@ -565,7 +486,6 @@
       setTimeout(() => document.getElementById('sheet-overlay').classList.add('hidden'), 300);
     }
 
-<<<<<<< HEAD
     function addToCartWithOptions(id) {
       const p = products.find(x => x.id === id);
       if (!p) return;
@@ -573,19 +493,6 @@
       updateCartCount();
       closeSheet();
       showMsg('Товар добавлен в корзину!');
-=======
-    function addToCart(id) {
-      const p = products.find(x => x.id === id);
-      if (!p) return;
-      cart.push({ ...p });
-      updateCartCount();
-
-      const btn = document.getElementById(`btn-${id}`);
-      if (btn) {
-        btn.classList.add('btn-success');
-        setTimeout(() => btn.classList.remove('btn-success'), 1000);
-      }
->>>>>>> 8b0fef7 (add api route)
     }
 
     function updateCartCount() { document.getElementById('cart-count').innerText = cart.length; }
@@ -636,7 +543,7 @@
       showCart();
     }
 
-    // Безопасный чекауты через защищенный серверный API на Vercel
+    // Оформление заказа и переход в WhatsApp с вашим номером
     async function checkout() {
       if (cart.length === 0) return;
 
@@ -650,6 +557,7 @@
 
       const total = cart.reduce((s, i) => s + (Number(i.price) || 0), 0);
 
+      // Сохраняем в Supabase
       const { error } = await db.from('orders').insert([{
         user_email: `${name} | ${phone}`,
         items: cart,
@@ -662,32 +570,31 @@
         return;
       }
 
-      // Отправка через защищенный мост
-      try {
-        const res = await fetch('/api/send-order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, phone, cart, total })
-        });
-        const result = await res.json();
-        if (!res.ok) {
-          alert("Серверная ошибка: " + (result.error || JSON.stringify(result)));
-        }
-      } catch (err) {
-        alert("Ошибка сети при отправке: " + err.message);
-      }
+      // Текст сообщения для WhatsApp
+      let itemsList = cart.map((item, index) => `${index + 1}. ${item.name} (Размер: ${item.size}, Цвет: ${item.color}) — ${item.price} ₸`).join('\n');
+      let message = `🔥 Новый заказ в Velutto Studio!\n\n` +
+                    `👤 Имя: ${name}\n` +
+                    `📞 Телефон: ${phone}\n\n` +
+                    `📦 Товары:\n${itemsList}\n\n` +
+                    `💰 Итого: ${total} ₸`;
 
-      showMsg('Заказ успешно принят! Менеджер свяжется с вами.');
+      // Ваш номер телефона менеджера
+      const managerPhone = '77011258770'; 
+      const whatsappUrl = `https://wa.me/${managerPhone}?text=${encodeURIComponent(message)}`;
+
+      showMsg('Заказ принят! Переходим в WhatsApp...');
+      
       cart = [];
       document.getElementById('order-name').value = '';
       document.getElementById('order-phone').value = '';
       updateCartCount();
       hideCart();
+
+      window.open(whatsappUrl, '_blank');
     }
 
     function writeToManager() {
-      if (window.Telegram?.WebApp) window.Telegram.WebApp.openTelegramLink('https://t.me/Azhar_Suleimenova');
-      else window.open('https://t.me/Azhar_Suleimenova', '_blank');
+      window.open('https://wa.me/77011258770', '_blank');
     }
 
     async function loadAdminOrders() {
@@ -828,77 +735,6 @@
       loadProducts();
     }
 
-<<<<<<< HEAD
-=======
-    // === Добавление товара ===
-    async function addProduct() {
-      const name = sanitize(document.getElementById('admin-name').value);
-      const price = parseFloat(document.getElementById('admin-price').value);
-      const sizesStr = document.getElementById('admin-sizes').value;
-      const colorsStr = document.getElementById('admin-colors').value;
-      const fileInput = document.getElementById('admin-photo');
-      const status = document.getElementById('admin-status');
-
-      if (!name || !price) {
-        status.innerText = 'Заполните название и цену';
-        return;
-      }
-
-      status.innerText = 'Загрузка...';
-
-      let imageUrl = null;
-
-      // Загрузка фото
-      if (fileInput.files.length > 0) {
-        const file = fileInput.files[0];
-        const fileName = `${Date.now()}.${file.name.split('.').pop()}`;
-
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('product-images')
-          .upload(fileName, file);
-
-        if (uploadError) {
-          status.innerText = 'Ошибка загрузки фото';
-          console.error(uploadError);
-          return;
-        }
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('product-images')
-          .getPublicUrl(fileName);
-
-        imageUrl = publicUrl;
-      }
-
-      const sizes = sizesStr ? sizesStr.split(',').map(s => s.trim()) : [];
-      const colors = colorsStr ? colorsStr.split(',').map(c => c.trim()) : [];
-
-      const { error } = await supabase.from('products').insert([{
-        name,
-        price,
-        images: imageUrl ? [imageUrl] : [],
-        sizes,
-        colors
-      }]);
-
-      if (error) {
-        status.innerText = 'Ошибка добавления товара';
-        console.error(error);
-        return;
-      }
-
-      status.innerText = 'Товар успешно добавлен!';
-      document.getElementById('admin-name').value = '';
-      document.getElementById('admin-price').value = '';
-      document.getElementById('admin-sizes').value = '';
-      document.getElementById('admin-colors').value = '';
-      fileInput.value = '';
-
-      loadProducts();
-    }
-
-    // Init
->>>>>>> 8b0fef7 (add api route)
     loadProducts();
     updateCartCount();
   </script>
